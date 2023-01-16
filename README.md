@@ -22,10 +22,10 @@ The code is split in two parts: the ABM simulations are written and run in C++, 
 The environment I am currently using is
 
 1. **Python**: 3.10.6
-  1. numpy 1.21.5
-  2. matplotlib 3.6.2
-  3. imageio 2.22.1
-  4. re 2.2.1
+    1. numpy 1.21.5
+    2. matplotlib 3.6.2
+    3. imageio 2.22.1
+    4. re 2.2.1
 2. **C++**: g++ compiler version 11.3.0, C++17 Standard Library
 
 ### Installation
