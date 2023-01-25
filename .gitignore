@@ -6,6 +6,6 @@
 *.avi
 /Time-lapse-movies
 *.zip
-*/data/*
+data/*
 *.o
 *.pyc
