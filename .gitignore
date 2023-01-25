@@ -9,3 +9,6 @@
 data/*
 *.o
 *.pyc
+
+# exception to the rule
+!data/.gitkeep
