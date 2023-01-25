@@ -1,29 +1,62 @@
 #ifndef BACTERIA_H
 #define BACTERIA_H
 
-class EColi
+class Bacteria
 {
   public:
-    double radius = 0.92 / 2.0 + 0.05; // 0.65 / 2 + 0.1
-    double max_length = 4.56; // 3.71
-    double inertia = 5.0;
-    double growth_rate = 0.0173;
-    double length = 2.25;
+    double radius;
+    double max_length;
+    double inertia;
+    double growth_rate;
+    double length;
+    Bacteria(double r = 0.1, double m = 2.0, double i = 5.0, double g = 0.01,
+             double l = 1.0){
+             radius = r; 
+             max_length = m;
+             inertia = i;
+             growth_rate = g;
+             length = l;
+    }
 };
 
-class EColiA22
+class EColiGFP: public Bacteria
 {
   public:
-    double radius = 1.20 / 2.0 + 0.05; // 0.89 / 2 + 0.1
-    double max_length = 4.10; // 3.05
-    double inertia = 5.0;
-    double growth_rate = 0.0173;
-    double length = 1.25;
+    EColiGFP(double r = 0.92 / 2.0 + 0.05, double m = 4.56,
+             double i = 5.0, double g = 0.009242, double l = 2.25)
+                       : Bacteria(r, m, i, g, l){ }
 };
 
-class BSubt
+class EColiMCh1: public Bacteria
 {
   public:
+    EColiMCh1(double r = 0.92 / 2.0 + 0.05, double m = 4.56,
+              double i = 5.0, double g = 0.008557, double l = 2.25)
+                       : Bacteria(r, m, i, g, l){ }
+};
+
+class EColiMCh2: public Bacteria
+{
+  public:
+    EColiMCh2(double r = 0.92 / 2.0 + 0.05, double m = 4.56,
+              double i = 5.0, double g = 0.009242, double l = 2.25)
+                       : Bacteria(r, m, i, g, l){ }
+};
+
+class EColiA22: public Bacteria
+{
+  public:
+    EColiA22(double r = 1.20 / 2.0 + 0.05, double m = 4.10,
+             double i = 5.0, double g = 0.0173, double l = 1.25)
+                       : Bacteria(r, m, i, g, l){ }
+};
+
+class BSubt: public Bacteria
+{
+  public:
+    BSubt(double r = 0.83 / 2.0 + 0.1, double m = 7.95,
+          double i = 5.0, double g = 0.0039, double l = 3.00)
+                       : Bacteria(r, m, i, g, l){ }
     double radius = 0.83 / 2.0 + 0.1;
     double max_length = 7.95;
     double inertia = 5.0;

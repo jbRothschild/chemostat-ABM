@@ -9,7 +9,7 @@ import imageio
 from pathlib import Path
 
 BACT_COL = {'0': 'r', '1': 'g', '2': 'b', '3': 'c', '4': 'm', '5': 'y',
-            '6': 'k', '7': 'lime'}
+            '6': 'k', '7': 'lime', '8' : 'k', '9' : 'k', '10' : 'k'}
 
 
 def convert_line_2_bacteria(line):
@@ -71,6 +71,7 @@ def plot_simulation(exp_dir, sim_nbr):
         resize = 2.0
         plt.figure(figsize=(width / resize, height / resize))
         pixels = 120. / resize
+        # pixels = 300. / resize
         ax = plt.axes()
         # ax.add_patch(Rectangle((21.0, 5.68), 2, 0.65))
         plt.ylim([0, height])

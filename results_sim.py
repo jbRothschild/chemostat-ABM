@@ -94,12 +94,12 @@ if __name__ == '__main__':
     N_strains_wt = [25]
     N_strains_vs = [82, 83, 84, 85, 86]
 
-    """
-    for exp_nbr in N_strains_wt:
+    
+    for exp_nbr in [0]:
         exp_dir = os.getcwd() + os.sep + 'data' + os.sep + f'c_exp_{exp_nbr}'
-        plot_gif(exp_dir, 1)
+        plot_gif(exp_dir, 2)
         initialized_start(exp_dir, nbr_traj, max_time, labels=labels[3])
-    """
+    
     """
     initialized_start(os.getcwd() + os.sep + 'data' + os.sep + 'c_exp_112',
                       3200, max_time, labels=['WT lineage 1', 'WT lineage 2'])
