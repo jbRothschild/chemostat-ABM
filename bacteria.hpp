@@ -22,16 +22,16 @@ class Bacteria
 class EColiGFP: public Bacteria
 {
   public:
-    EColiGFP(double r = 0.92 / 2.0 + 0.05, double m = 4.56,
-             double i = 5.0, double g = 0.009242, double l = 2.25)
+    EColiGFP(double r = 0.92 / 2.0 + 0.05, double m = 4.56,  // 0.009242
+             double i = 5.0, double g = 0.01155, double l = 2.25)
                        : Bacteria(r, m, i, g, l){ }
 };
 
 class EColiMCh1: public Bacteria
 {
   public:
-    EColiMCh1(double r = 0.92 / 2.0 + 0.05, double m = 4.56,
-              double i = 5.0, double g = 0.008557, double l = 2.25)
+    EColiMCh1(double r = 0.92 / 2.0 + 0.05, double m = 4.56,  // g = 0.008557
+              double i = 5.0, double g = 0.01155, double l = 2.25)
                        : Bacteria(r, m, i, g, l){ }
 };
 

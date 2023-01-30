@@ -1110,6 +1110,8 @@ int place_cell(Environment &enviro, Bacteria &bact, int nbr_bact_strains,
   bool intersect = true;
   bool check_intersect;
   mt19937 cell_placement(seed);
+  mt19937 rng(seed);
+  uniform_int_distribution<int> gen(1, 3); // uniform, unbiased
 
   auto sinFunc = [](double x) {
       const double x0 = 0.0;
@@ -1119,59 +1121,61 @@ int place_cell(Environment &enviro, Bacteria &bact, int nbr_bact_strains,
 
   //uniform_real_distribution<double> x_dist(0 , enviro.CHANNEL_WIDTH);
   Sampled_distribution<> x_dist(sinFunc, 0.0, enviro.CHANNEL_WIDTH);
-  uniform_real_distribution<double> y_dist(bact.max_length/2.0,
-                         enviro.CHANNEL_HEIGHT - bact.max_length/2.0);
-  uniform_real_distribution<double> init_angle(0, 2*PI);
+  uniform_real_distribution<double> y_dist(bact.max_length / 2.0,
+                         enviro.CHANNEL_HEIGHT - bact.max_length / 2.0);
+  uniform_real_distribution<double> init_angle(0, 2 * PI);
 
   for (int i = 0 ; i < nbr_bact_strains; i++){
-    length = bact.max_length / 2.0;
-    intersect = true;
-    while (intersect)
-    {
-       intersect = false;
-       angle = init_angle(cell_placement);
-       x = x_dist(cell_placement);
-       y = y_dist(cell_placement);
+    int r = gen(rng);
+    for (int j = 0 ; j < r; j++){
+      length = bact.max_length / 2.0;
+      intersect = true;
+      while (intersect)
+      {
+        intersect = false;
+        angle = init_angle(cell_placement);
+        x = x_dist(cell_placement);
+        y = y_dist(cell_placement);
 
-       // loop to place cells on grid
-       for (int x = 1; x < enviro.NUM_CELLS_WIDTH; x++)
-       {
-         for (int y = 1; y < enviro.NUM_CELLS_HEIGHT; y++)
-         {
-           agent = enviro.grid_[x][y];
+        // loop to place cells on grid
+        for (int x = 1; x < enviro.NUM_CELLS_WIDTH; x++)
+        {
+          for (int y = 1; y < enviro.NUM_CELLS_HEIGHT; y++)
+          {
+            agent = enviro.grid_[x][y];
 
-           // check that cells don't intersect
-           while (agent != NULL)
-           {
-             check_intersect= pointsIntersect(x + length / 2 * cos(angle),
-                                              x - length / 2 * cos(angle),
-                                              agent->x + agent->length / 2 * cos(agent->angle),
-                                              agent->x - agent->length / 2 * cos(agent->angle),
-                                              y + length / 2 * sin(angle),
-                                              y - length / 2 * sin(angle),
-                                              agent->y + agent->length / 2 * sin(agent->angle),
-                                              agent->y - agent->length / 2 * sin(agent->angle)
-                                             );
-             intersect = (intersect || check_intersect);
-             agent = agent->next_;
-           }
-         }
-       }
+            // check that cells don't intersect
+            while (agent != NULL)
+            {
+              check_intersect= pointsIntersect(x + length / 2 * cos(angle),
+                                                x - length / 2 * cos(angle),
+                                                agent->x + agent->length / 2 * cos(agent->angle),
+                                                agent->x - agent->length / 2 * cos(agent->angle),
+                                                y + length / 2 * sin(angle),
+                                                y - length / 2 * sin(angle),
+                                                agent->y + agent->length / 2 * sin(agent->angle),
+                                                agent->y - agent->length / 2 * sin(agent->angle)
+                                              );
+              intersect = (intersect || check_intersect);
+              agent = agent->next_;
+            }
+          }
+        }
+      }
+
+      // after checks are passed, actually initialize new cell
+      ABMagent* newBacteriaPntr = new ABMagent(&enviro, x, y, bact.radius,
+                                              bact.max_length,
+                                              bact.length,
+                                              0.0, 0.0, 0.0, 0.0,
+                                              angle,
+                                              bact.inertia,
+                                              0.0,
+                                              bact.growth_rate,
+                                              to_string(strain_nbr),
+                                              0.0, 0.0, 0.0
+                                              );
     }
-
-    // after checks are passed, actually initialize new cell
-    ABMagent* newBacteriaPntr = new ABMagent(&enviro, x, y, bact.radius,
-                                             bact.max_length,
-                                             bact.length,
-                                             0.0, 0.0, 0.0, 0.0,
-                                             angle,
-                                             bact.inertia,
-                                             0.0,
-                                             bact.growth_rate,
-                                             to_string(strain_nbr),
-                                             0.0, 0.0, 0.0
-                                            );
-    cout << bact.max_length << "\n";
     strain_nbr++;
   }
 
@@ -1265,7 +1269,7 @@ int main (int argc, char* argv[]) {
   // setup simulation parameters
   double dt = 0.00025; // in minutes 0.000025
   double save_time = 5.0; // X minutes
-  int nbr_hours = 5;
+  int nbr_hours = 15;
 
   // metadata of simulations
   string datafolder = "./data";
