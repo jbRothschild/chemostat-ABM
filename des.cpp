@@ -175,7 +175,7 @@ class Environment
     string file_agents;
     string file_data;
     int nbr_strains;
-    static constexpr double CELL_SIZE = 5.0;
+    static constexpr double CELL_SIZE = 6.0;
 
     static constexpr double CHANNEL_WIDTH = 44.0;
     static constexpr double CHANNEL_HEIGHT = 12.0;
@@ -1111,7 +1111,7 @@ int place_cell(Environment &enviro, Bacteria &bact, int nbr_bact_strains,
   bool check_intersect;
   mt19937 cell_placement(seed);
   mt19937 rng(seed);
-  uniform_int_distribution<int> gen(1, 3); // uniform, unbiased
+  uniform_int_distribution<int> gen(1, 1); // uniform, unbiased
 
   auto sinFunc = [](double x) {
       const double x0 = 0.0;
@@ -1269,7 +1269,7 @@ int main (int argc, char* argv[]) {
   // setup simulation parameters
   double dt = 0.00025; // in minutes 0.000025
   double save_time = 5.0; // X minutes
-  int nbr_hours = 15;
+  int nbr_hours = 16;
 
   // metadata of simulations
   string datafolder = "./data";
@@ -1286,7 +1286,7 @@ int main (int argc, char* argv[]) {
   enviro.writeSimulationParameters();
 
   // Josh stuff
-  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 1, 1, 0, 0, 0); // WT, A22, Bsub
+  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 1, 0, 0, 1, 0); // WT, A22, Bsub
 
   // Boundary stuff
   // enviro.nbr_strains = initialize_1boundary(enviro, EXP_NUM, SIM_NUM);
