@@ -6,9 +6,9 @@
 #define AREA_BACT 4.427928249198705
 #define PI 3.14159265359
 #define BACT1_M 4.56
-#define BACT2_M 5.56
-#define BACT1_G 0.01155  // 1h doubling time
-#define BACT2_G 0.01155
+#define BACT2_M 4.56
+#define BACT1_G 0.01284
+#define BACT2_G 0.01155 // 1h doubling time, ln(2) / 60.
 
 double radiusConstantArea(double length)
 {
@@ -46,7 +46,7 @@ class EColiMCh1: public Bacteria
 {
   public:
     EColiMCh1(double r = radiusConstantArea(BACT1_M), double m = BACT1_M,  
-              double i = 5.0, double g = BACT1_G, double l = 2.0)
+              double i = 5.0, double g = BACT2_G, double l = 2.0)
                        : Bacteria(r, m, i, g, l){ } // g = 0.009242??
 };
 

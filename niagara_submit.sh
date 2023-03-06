@@ -19,4 +19,4 @@ export OMP_NUM_THREADS=1
 
 # mkdir -p ${RESULTS_DIR}/${SIM_DIR}
 
-parallel --joblog slurm-$SLURM_JOBID.log --sshdelay 0.1 --wd $PWD "./des60.o 60 {}" ::: {0..4999}
+parallel --joblog slurm-$SLURM_JOBID.log --sshdelay 0.1 --wd $PWD "./des101.o 101 {}" ::: {0..4999}

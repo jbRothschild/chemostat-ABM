@@ -25,7 +25,7 @@ using namespace std::chrono;
 
 // desktop : g++ -std=c++17 des.cpp -o des.o
 // niagara : module load gcc, g++ -std=c++17 -o des.o des.cpp -lstdc++fs
-// laptop : g++-8 -std=c++17 des.cpp -o des.o -lstdc++fs
+// laptop : g++-9 -std=c++17 des.cpp -o des.o -lstdc++fs
 //
 // ./des.o 42 42
 random_device rd;  // could set this to a number for a fixed seed
@@ -1286,7 +1286,7 @@ int main (int argc, char* argv[]) {
   enviro.writeSimulationParameters();
 
   // Josh stuff
-  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 1, 0, 0, 1, 0); // WT, A22, Bsub
+  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 1, 1, 0, 0, 0); // WT, A22, Bsub
 
   // Boundary stuff
   // enviro.nbr_strains = initialize_1boundary(enviro, EXP_NUM, SIM_NUM);
