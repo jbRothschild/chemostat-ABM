@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --nodes=40
 #SBATCH --ntasks-per-node=40
-#SBATCH --time=12:00:00
+#SBATCH --time=16:00:00
 #SBATCH --job-name=ECvEC
 
 #run this code using jbroths:~$ sbatch *script_name.sh*

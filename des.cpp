@@ -102,6 +102,7 @@ class ABMagent
     double max_length;
     double split_length;
     double inertia;
+    double damping;
     double x;
     double y;
     double angle;
@@ -127,6 +128,7 @@ class ABMagent
       double radius_,
       double max_length_,
       double length_,
+      double damping_,
       double vel_x_,
       double vel_y_,
       double acc_x_,
@@ -263,6 +265,7 @@ ABMagent::ABMagent
   double radius_,
   double max_length_,
   double length_,
+  double damping_,
   double vel_x_,
   double vel_y_,
   double acc_x_,
@@ -283,6 +286,7 @@ ABMagent::ABMagent
   radius = radius_;
   max_length = max_length_;
   length = length_;
+  damping = damping_;
   vel_x = vel_x_;
   vel_y = vel_y_;
   acc_x = acc_x_;
@@ -354,7 +358,8 @@ void Environment::writeSimulationAgents()
                 << ", " << agent->max_length << ", " << agent->split_length
                 << ", " << agent->inertia << ", " << agent->vel_x
                 << ", " << agent->vel_y << ", " << agent->vel_angle
-                << ", " << agent->acc_x << ", " << agent->acc_y << "\n";
+                << ", " << agent->acc_x << ", " << agent->acc_y << ", "
+                << agent->damping << "\n";
           agent = agent->next_;
         }
       }
@@ -544,6 +549,7 @@ void ABMagent::split()
   vel_x += vel_angle * ( y - y_prev );
   vel_y -= vel_angle * ( x - x_prev );
   double vel_angle_daugh = vel_angle;
+  double damping_daugh = damping;
 
   force_x_prev = 0.0;
   force_y_prev = 0.0;
@@ -552,8 +558,8 @@ void ABMagent::split()
   environment->move(this, x_prev, y_prev);
 
   ABMagent* daughter = new ABMagent(environment, x_daugh, y_daugh, radius, max_length,
-                                    length_daugh, vel_x_daugh, vel_y_daugh,
-                                    acc_x, acc_y, angle_daugh,
+                                    length_daugh, damping_daugh, vel_x_daugh,
+                                    vel_y_daugh, acc_x, acc_y, angle_daugh,
                                     inertia, vel_angle_daugh, growth_rate, label_daugh,
                                     force_x_prev, force_y_prev, torque_prev);
 
@@ -579,10 +585,10 @@ void ABMagent::move(double dt, double damping_lin, double damping_tor)
   // reposition cell and re-orient
   double x_prev = x;
   double y_prev = y;
-  x += dt * force_x / ( reduced_mass * damping_lin * length );
-  y += dt * force_y / ( reduced_mass * damping_lin * length );
+  x += dt * force_x / ( reduced_mass * damping * damping_lin * length );
+  y += dt * force_y / ( reduced_mass * damping * damping_lin * length );
   double inertia_dt = reduced_mass * pow(length, 2.0) / 12.;
-  angle += dt * torque / ( inertia_dt * damping_tor * length );
+  angle += dt * torque / ( inertia_dt * damping * damping_tor * length );
 
   // reset forces to zero for next round
   force_x = 0.0;
@@ -967,6 +973,7 @@ int initialize_cells_load_relabel(Environment &enviro, string filename,
                         stod(vect[5]),
                         stod(vect[7]),
                         stod(vect[4]),
+                        stod(vect[15]),
                         0.0, 0.0, 0.0, 0.0,
                         stod(vect[3]),
                         stod(vect[8]),
@@ -1015,6 +1022,7 @@ int initialize_cells_load(Environment &enviro, string filename, int timepoint)
                         stod(vect[5]),
                         stod(vect[7]),
                         stod(vect[4]),
+                        stod(vect[15]),
                         0.0, 0.0, 0.0, 0.0,
                         stod(vect[3]),
                         stod(vect[8]),
@@ -1037,8 +1045,8 @@ int initialize_cells2(Environment &enviro, int SIM_NUM) {
   // initialize 2 different cells from different types of cells
   BSubt bacteria1;
   BSubt bacteria2;
-  double length1 = bacteria1.max_length/2.0;
-  double length2 = bacteria2.max_length/2.0;
+  double length1 = bacteria1.max_length / 2.0;
+  double length2 = bacteria2.max_length / 2.0;
   double x1, x2, y1, y2, angle1, angle2;
   double inertia = 5.0;
   mt19937 cell_placement(SIM_NUM);
@@ -1076,6 +1084,7 @@ int initialize_cells2(Environment &enviro, int SIM_NUM) {
                     bacteria1.radius,
                     bacteria1.max_length,
                     bacteria1.length,
+                    bacteria1.damping,
                     0.0, 0.0, 0.0, 0.0,
                     angle1,
                     bacteria1.inertia,
@@ -1087,6 +1096,7 @@ int initialize_cells2(Environment &enviro, int SIM_NUM) {
                     bacteria2.radius,
                     bacteria2.max_length,
                     bacteria2.length,
+                    bacteria2.damping,
                     0.0, 0.0, 0.0, 0.0,
                     angle2,
                     bacteria2.inertia,
@@ -1167,6 +1177,7 @@ int place_cell(Environment &enviro, Bacteria &bact, int nbr_bact_strains,
       ABMagent* newBacteriaPntr = new ABMagent(&enviro, x, y, bact.radius,
                                               bact.max_length,
                                               bact.length,
+                                              bact.damping,
                                               0.0, 0.0, 0.0, 0.0,
                                               angle,
                                               bact.inertia,
@@ -1232,6 +1243,7 @@ int initialize_1boundary(Environment &enviro, int EXP_NUM, int bndry_nbr) {
                       bacteria.radius,
                       bacteria.max_length,
                       length,
+                      bacteria.damping,
                       0.0, 0.0, 0.0, 0.0,
                       angle,
                       bacteria.inertia,
@@ -1248,6 +1260,7 @@ int initialize_1boundary(Environment &enviro, int EXP_NUM, int bndry_nbr) {
                       bacteria.radius,
                       bacteria.max_length,
                       length,
+                      bacteria.damping,
                       0.0, 0.0, 0.0, 0.0,
                       angle,
                       bacteria.inertia,
@@ -1269,7 +1282,7 @@ int main (int argc, char* argv[]) {
   // setup simulation parameters
   double dt = 0.00025; // in minutes 0.000025
   double save_time = 5.0; // X minutes
-  int nbr_hours = 16;
+  int nbr_hours = 10;
 
   // metadata of simulations
   string datafolder = "./data";
@@ -1286,7 +1299,7 @@ int main (int argc, char* argv[]) {
   enviro.writeSimulationParameters();
 
   // Josh stuff
-  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 1, 1, 0, 0, 0); // WT, A22, Bsub
+  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 1, 0, 0, 1, 0); // WT, A22, Bsub
 
   // Boundary stuff
   // enviro.nbr_strains = initialize_1boundary(enviro, EXP_NUM, SIM_NUM);

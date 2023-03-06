@@ -95,9 +95,9 @@ if __name__ == '__main__':
     N_strains_vs = [82, 83, 84, 85, 86]
 
     
-    for exp_nbr in [24]:
+    for exp_nbr in [2]:
         exp_dir = os.getcwd() + os.sep + 'data' + os.sep + f'c_exp_{exp_nbr}'
-        plot_gif(exp_dir, 3)
+        plot_gif(exp_dir, 0)
         initialized_start(exp_dir, nbr_traj, max_time, labels=labels[2])
     
     """
