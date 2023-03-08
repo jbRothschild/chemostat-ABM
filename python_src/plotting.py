@@ -8,7 +8,7 @@ import imageio
 # import itertools
 from pathlib import Path
 
-BACT_COL = {'0': 'r', '1': 'g', '2': 'b', '3': 'c', '4': 'm', '5': 'y',
+BACT_COL = {'0': 'g', '1': 'r', '2': 'b', '3': 'c', '4': 'm', '5': 'y',
             '6': 'k', '7': 'lime', '8' : 'k', '9' : 'k', '10' : 'k'}
 
 

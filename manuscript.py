@@ -105,6 +105,7 @@ def geometryComparison(filename, numberTrajectories):
 
 def densityComparison(filename, numberTrajectories):
     listDirectories = [1, 5, 9, 13, 17]
+    listDirectories = [101, 105, 109, 113, 117, 121]
     gfpFixateFraction = []
     mchFixateFraction = []
     coexistFraction = []
@@ -154,7 +155,7 @@ def densityComparison(filename, numberTrajectories):
 
     
 if __name__ == '__main__':
-    growthComparison("compare_growth_rate", 5000)
-    geometryComparison("compare_geometry", 5000)
+    # growthComparison("compare_growth_rate", 5000)
+    # geometryComparison("compare_geometry", 5000)
     densityComparison("compare_density", 5000)
     
