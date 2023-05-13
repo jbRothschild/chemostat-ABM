@@ -43,3 +43,25 @@ for dir in "${listDirectories[@]}"; do
         cp "data/c_exp_${dir}/sim$(echo $fileMinus)_data.txt" "data/c_exp_${dir}/sim$(echo $file)_data.txt"
     done
 done
+
+listDirectories=("656" "676" "696" "716" "736" "756" "776" "796" "816" "836" "856")
+listFiles=(1331 1484 2694 4986)
+
+for dir in "${listDirectories[@]}"; do
+    for file in "${listFiles[@]}"; do
+        fileMinus=`expr $file - 1`
+        cp "data/c_exp_${dir}/sim$(echo $fileMinus).txt" "data/c_exp_${dir}/sim$(echo $file).txt"
+        cp "data/c_exp_${dir}/sim$(echo $fileMinus)_data.txt" "data/c_exp_${dir}/sim$(echo $file)_data.txt"
+    done
+done
+
+listDirectories=("901" "902" "905" "910" "920")
+listFiles=(2694 4986)
+
+for dir in "${listDirectories[@]}"; do
+    for file in "${listFiles[@]}"; do
+        fileMinus=`expr $file - 1`
+        cp "data/c_exp_${dir}/sim$(echo $fileMinus).txt" "data/c_exp_${dir}/sim$(echo $file).txt"
+        cp "data/c_exp_${dir}/sim$(echo $fileMinus)_data.txt" "data/c_exp_${dir}/sim$(echo $file)_data.txt"
+    done
+done
