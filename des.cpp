@@ -14,6 +14,7 @@
 #include <vector>
 #include <filesystem>
 #include <chrono>
+#include <iomanip>
 #include "intersect.hpp"
 #include "bacteria.hpp"
 #include "sampled_distribution.hpp"
