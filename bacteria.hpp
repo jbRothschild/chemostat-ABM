@@ -7,7 +7,7 @@
 #define PI 3.14159265359
 #define BACT1_M 4.56
 #define BACT2_M 4.16
-#define BACT1_G 0.01155
+#define BACT1_G 0.012836// ln(2) / 54 = 0.012836
 #define BACT2_G 0.01155 // 1h doubling time, ln(2) / 60.
 
 double radiusConstantArea(double length)
