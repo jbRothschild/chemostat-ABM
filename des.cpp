@@ -229,6 +229,7 @@ class Environment
     void writeSimulationAgents();
     bool writeSimulationData();
     void writeSimulationParameters();
+    bool clearGrid();
   private:
 };
 
@@ -373,9 +374,29 @@ void Environment::writeSimulationAgents()
 
 int countDigit(int n)
 {
-    if (n/10 == 0)
+    if (n / 10 == 0)
         return 1;
     return 1 + countDigit(n / 10);
+}
+
+bool Environment::clearGrid()
+{
+    for (int x = 1; x < NUM_CELLS_WIDTH; x++)
+  {
+    for (int y = 1; y < NUM_CELLS_HEIGHT; y++)
+    {
+      ABMagent* agent;
+      ABMagent* temp;
+      agent = grid_[x][y];
+      while (grid_[x][y] != NULL)
+      {
+        temp = grid_[x][y];
+        grid_[x][y] = grid_[x][y]->next_;
+        delete temp;
+      }
+    }
+  }
+  return 0;
 }
 
 
@@ -1113,12 +1134,14 @@ int initialize_cells2(Environment &enviro, int SIM_NUM) {
 
 
 int place_cell(Environment &enviro, Bacteria &bact, int nbr_bact_strains,
-               int seed, int &strain_nbr) {
+               int seed, int &strain_nbr, bool *restart) {
 
   ABMagent* agent;
   double x, y, angle, length;
   bool intersect = true;
   bool check_intersect;
+  int tried_placement = 0;
+  int max_trials = 1000;
   mt19937 cell_placement(seed);
   mt19937 rng(seed);
   uniform_int_distribution<int> gen(1, 1); // uniform, unbiased
@@ -1146,7 +1169,7 @@ int place_cell(Environment &enviro, Bacteria &bact, int nbr_bact_strains,
         angle = init_angle(cell_placement);
         x = x_dist(cell_placement);
         y = y_dist(cell_placement);
-
+        // cout << "-------trying...------\n";
         // loop to place cells on grid
         for (int x = 1; x < enviro.NUM_CELLS_WIDTH; x++)
         {
@@ -1171,9 +1194,17 @@ int place_cell(Environment &enviro, Bacteria &bact, int nbr_bact_strains,
             }
           }
         }
+        tried_placement += 1;
+        if (tried_placement > max_trials){
+          *restart = true;
+          // cout << "\n\n-------FAILED------\n\n";
+          return 0;
+        }
       }
-
       // after checks are passed, actually initialize new cell
+      stringstream ss;
+      ss << setw(countDigit(enviro.nbr_strains)) << setfill('0') << strain_nbr;
+      string label = ss.str();
       ABMagent* newBacteriaPntr = new ABMagent(&enviro, x, y, bact.radius,
                                               bact.max_length,
                                               bact.length,
@@ -1183,13 +1214,13 @@ int place_cell(Environment &enviro, Bacteria &bact, int nbr_bact_strains,
                                               bact.inertia,
                                               0.0,
                                               bact.growth_rate,
-                                              to_string(strain_nbr),
+                                              label,
                                               0.0, 0.0, 0.0
                                               );
     }
     strain_nbr++;
   }
-
+  // cout << "\n\n-------DONE PLACING CELLS------\n\n";
   return 0;
 }
 
@@ -1202,17 +1233,26 @@ int initialize_N_strain(Environment &enviro, int SIM_NUM, int nbr_strains_GFP,
   EColiMCh2 ecoliMCh2;
   EColiA22 ecoliA22;
   BSubt bsubt;
+  bool restart = true;
   int strain_nbr = 0;
+  int SEED = SIM_NUM;
 
-  place_cell(enviro, ecoliGFP, nbr_strains_GFP, SIM_NUM, strain_nbr);
-  place_cell(enviro, ecoliMCh1, nbr_strains_MCh1, SIM_NUM + 1, strain_nbr);
-  place_cell(enviro, ecoliMCh2, nbr_strains_MCh2, SIM_NUM + 2, strain_nbr);
-  place_cell(enviro, ecoliA22, nbr_strains_A22, SIM_NUM + 3, strain_nbr);
-  place_cell(enviro, bsubt, nbr_strains_bsub, SIM_NUM + 4, strain_nbr);
-
-  enviro.writeSimulationAgents();
   enviro.nbr_strains = nbr_strains_GFP + nbr_strains_MCh1 + nbr_strains_MCh2
                        + nbr_strains_A22 + nbr_strains_bsub;
+
+  while (restart) {
+    strain_nbr = 0;
+    restart = false;
+    enviro.clearGrid();
+    place_cell(enviro, ecoliGFP, nbr_strains_GFP, SEED, strain_nbr, &restart);
+    place_cell(enviro, ecoliMCh1, nbr_strains_MCh1, SEED + 1, strain_nbr, &restart);
+    place_cell(enviro, ecoliMCh2, nbr_strains_MCh2, SEED + 2, strain_nbr, &restart);
+    place_cell(enviro, ecoliA22, nbr_strains_A22, SEED + 3, strain_nbr, &restart);
+    place_cell(enviro, bsubt, nbr_strains_bsub, SEED + 4, strain_nbr, &restart);
+    SEED += 10000;
+  }
+
+  enviro.writeSimulationAgents();
   enviro.writeSimulationData();
 
   return enviro.nbr_strains;
@@ -1281,8 +1321,8 @@ int main (int argc, char* argv[]) {
 
   // setup simulation parameters
   double dt = 0.00025; // in minutes 0.000025
-  double save_time = 5.0; // X minutes
-  int nbr_hours = 10;
+  double save_time = 60.0; // X minutes
+  int nbr_hours = 13;
 
   // metadata of simulations
   string datafolder = "./data";
@@ -1299,7 +1339,7 @@ int main (int argc, char* argv[]) {
   enviro.writeSimulationParameters();
 
   // Josh stuff
-  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 1, 0, 0, 1, 0); // WT, A22, Bsub
+  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 15, 0, 0, 0, 0); // WT, A22, Bsub
 
   // Boundary stuff
   // enviro.nbr_strains = initialize_1boundary(enviro, EXP_NUM, SIM_NUM);

@@ -12,6 +12,7 @@ BACT_COL = {'0': 'r', '1': 'g', '2': 'b', '3': 'c', '4': 'm', '5': 'y',
 
 def collect_data_array(data_folder, nbr_simulations, nbr_lines=None,
                        timestep=1. / 12., labels=None):
+    row_delete = []
     with open(data_folder + os.sep + 'sim0_data.txt') as f:
         first_line = f.readline()
     nbr_species = first_line.count(",") + 1
@@ -20,14 +21,21 @@ def collect_data_array(data_folder, nbr_simulations, nbr_lines=None,
                                            + os.sep + 'sim0_data.txt'))
     data = np.zeros((nbr_simulations, nbr_species, nbr_lines))
     for i in np.arange(0, nbr_simulations):
+        print(i)
         time = 0
-        with open(data_folder + os.sep + 'sim' + str(i) + "_data.txt") as f:
-            for line in f:
-                if time < nbr_lines:
-                    strip_line = line.strip("[]\n")
-                    for j, spec in enumerate(strip_line.split(",")):
-                        data[i, j, time] = float(spec)
-                time += 1
+        filename = data_folder + os.sep + 'sim' + str(i) + "_data.txt"
+        if os.path.exists(filename):
+            with open(filename) as f:
+                for line in f:
+                    if time < nbr_lines:
+                        strip_line = line.strip("[]\n")
+                        for j, spec in enumerate(strip_line.split(",")):
+                            data[i, j, time] = float(spec)
+                    time += 1
+        else:
+            row_delete.append(i)
+    
+    data = np.delete(data, row_delete, 0)
 
     return data
 
@@ -128,7 +136,7 @@ def distribution_extinction(data_folder, nbr_simulations,
     nbr_species = np.shape(data)[1]
     extinctions = [[] for _ in range(nbr_species)]
     nbr_extinctions = np.zeros((nbr_species))
-    for i in np.arange(0, nbr_simulations):
+    for i in np.arange(0, data.shape[0]):
         for j in np.arange(0, nbr_species):
             zeros = np.where(data[i, j, :] == 0.0)[0]
             if zeros != []:
@@ -281,7 +289,7 @@ def fix_vs_coexi(data_folder, nbr_simulations, max_time):
             zeros = np.where(data[i, j, :] == 0.0)[0]
             if zeros != []:
                 nbr_extinctions[j] += 1.
-    nbr_extinctions /= nbr_simulations
+    nbr_extinctions /= data.shape[0]
     nbr_coexistence = 1. - np.sum(nbr_extinctions)
 
     return np.append(nbr_extinctions, nbr_coexistence)

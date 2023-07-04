@@ -8,11 +8,13 @@ import multiprocessing
 import matplotlib
 import os
 
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from matplotlib.colors import Normalize #color in log the maps
+
 random.seed()
 plt.style.use('python_src/custom.mplstyle')
 
 import psutil
-# print(psutil.cpu_count())
 NUM_PROCESSES = int(np.floor( psutil.cpu_count() / 2))
 psutil.cpu_times_percent(interval=1, percpu=False)
 
@@ -132,6 +134,7 @@ def polya_trials(numTrials, numDraws, vecStartAbundance, vecAdvantage):
     distribution = np.array(pool.starmap(polya_draws, args))
     return distribution
 
+
 def testing_polya():
     # checking whether 2 methods are identical (they are)
     initialSpecies = np.array([2, 2])
@@ -158,6 +161,7 @@ def testing_polya():
     plt.show()
     return 0
 
+
 def initial_density_plot_A(numGenerations, fixateFraction):
     # define regimes of fixation of coexistence
     coexistence = (fixateFraction, 1. - fixateFraction)
@@ -173,8 +177,8 @@ def initial_density_plot_A(numGenerations, fixateFraction):
     for i, density in enumerate(initDensity):
         vecStartAbundance = np.array([density, density])
         initCells = np.sum(vecStartAbundance)
-        numDraws = initCells * ( 2 ** numGenerations - 1)
-        # numDraws = 256 - initCells
+        # numDraws = initCells * ( 2 ** numGenerations - 1)
+        numDraws = numGenerations - initCells
         #dist = polya_two_species_distribution(numDraws, vecStartAbundance)
         dist = polya_probability_two_species(numDraws, vecStartAbundance)      
         x = np.linspace(0, 1.0, len(dist))
@@ -211,12 +215,11 @@ def initial_density_plot(numGenerations, fixateFraction):
     colors = [cmap(nbr) for nbr in np.linspace(0.0, 0.8, num=len(initDensity))]
     
     # define figure
-    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.8, 4.8))
+    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.0, 2.5))
     
     for i, density in enumerate(initDensity):
         vecStartAbundance = np.array([density, density])
         initCells = np.sum(vecStartAbundance)
-        # numDraws = initCells * ( 2 ** numGenerations - 1)
         numDraws = numGenerations - initCells
         #dist = polya_two_species_distribution(numDraws, vecStartAbundance)
         dist = polya_probability_two_species(numDraws, vecStartAbundance)      
@@ -257,7 +260,7 @@ def initial_density_plot(numGenerations, fixateFraction):
     ax2.set_ylim(0.0, 1.0)
     ax2.set_xlim(0, 21)
     
-    filename = 'polya_density_12'
+    filename = 'polya_density'
     plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".pdf")
     plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".png")
         
@@ -287,13 +290,13 @@ def initial_density_growth_plot(numTrials, numGenerations, fixateFraction,
     colors = [cmap(nbr) for nbr in np.linspace(0.0, 0.8, num=len(initDensity))]
     
     # define figure
-    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.8, 4.8))
+    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.0, 2.5))
     vecAdvantage = np.array(advantages)
     for i, density in enumerate(initDensity):
         # settings for simualtion
         vecStartAbundance = np.array([density, density])
         initCells = np.sum(vecStartAbundance)
-        numDraws = initCells * ( 2 ** numGenerations - 1)
+        numDraws = numGenerations - initCells
         
         # simulation
         simula = polya_trials(numTrials, numDraws, vecStartAbundance,
@@ -316,11 +319,11 @@ def initial_density_growth_plot(numTrials, numGenerations, fixateFraction,
     ax1.set_ylabel('Probability')
     ax1.axvline(x = coexistence[0], color=settings.colors['mCherry'], ls=':')
     ax1.axvline(x = coexistence[1], color=settings.colors['eGFP'], ls=':')
-    ax1.text(0.4, 0.00011, 'Coexistence', color=settings.colors['coexistence'])
-    ax1.text(0.025, 0.00011, 'mCherry fix.', color=settings.colors['mCherry'])
-    ax1.text(0.825, 0.00011, 'eGFP fix.', color=settings.colors['eGFP'])
-    ax1.legend(title='Initial density', loc=(0.01, 0.1), framealpha=0.9)
-    # ax1.set_ylim(0.0, 1.0)
+    ax1.text(0.4, 0.27, 'Coexistence', color='k')
+    ax1.text(0.025, 0.27, 'mCherry', color='k')
+    ax1.text(0.85, 0.27, 'eGFP', color='k')
+    ax1.legend(title='Initial density', loc=(0.03, 0.1), framealpha=0.9)
+    ax1.set_ylim(0.0, 0.3)
     ax1.set_xlim(0.0, 1.0)
     
     # plot for probability of certain densities
@@ -346,7 +349,7 @@ def initial_density_growth_plot(numTrials, numGenerations, fixateFraction,
     ax2.set_ylim(0.0, 1.0)
     ax2.set_xlim(0, 21)
     
-    filename = 'polya_density_g'
+    filename = 'polya_density_g_5'
     plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".pdf")
     plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".png")
         
@@ -372,14 +375,18 @@ def selection_advantage_plot(numTrials, numGenerations, vecStartAbundance,
     probDensityCoexist = []
     cmapname = 'viridis'
     cmap = matplotlib.cm.get_cmap(cmapname)
-    colors = [cmap(nbr) for nbr in np.linspace(0.0, 0.8, num=len(advantage))]
+    range_cmap = (0.0, 0.8)
+    colors = [cmap(nbr) for nbr in np.linspace(range_cmap[0], range_cmap[1],
+                                               num=len(advantage))]
+    short_range = cmap(np.linspace(range_cmap[0], range_cmap[1], cmap.N))
+    cmap_short = matplotlib.colors.LinearSegmentedColormap.from_list('cut_map', short_range)
     
-    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.8, 4.8))
+    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.0, 2.5))
     for i, fitness in enumerate(advantage):
         # simualtions
         vecAdvantage = np.array([fitness, 1.0])
         initCells = np.sum(vecStartAbundance)
-        numDraws = initCells * ( 2 ** numGenerations - 1)
+        numDraws = numGenerations - initCells
         simula = polya_trials(numTrials, numDraws, vecStartAbundance,
                               vecAdvantage)
 
@@ -398,10 +405,21 @@ def selection_advantage_plot(numTrials, numGenerations, vecStartAbundance,
     ax1.set_ylabel('Probability')
     ax1.axvline(x = coexistence[0], color=settings.colors['mCherry'], ls=':')
     ax1.axvline(x = coexistence[1], color=settings.colors['eGFP'], ls=':')
-    ax1.text(0.4, 0.9, 'Coexistence', color=settings.colors['coexistence'])
-    ax1.text(0.025, 0.9, 'mCherry fix.', color=settings.colors['mCherry'])
-    ax1.text(0.825, 0.9, 'eGFP fix.', color=settings.colors['eGFP'])
-    ax1.legend(title='Growth rate ratio', loc=(0.25, 0.1), framealpha=0.1)
+    ax1.text(0.4, 0.9, 'Coexistence', color='k')
+    ax1.text(0.025, 0.9, 'mCherry', color='k')
+    ax1.text(0.85, 0.9, 'eGFP', color='k')
+    bbox = (0.35, 0.3, 0.3, 0.03)
+    cbaxes = inset_axes(ax1, width='100%', height='100%', bbox_to_anchor=bbox,
+                        bbox_transform=ax1.transAxes,
+                        loc='center') 
+    norm = Normalize(1.0, 2.0)
+    #cbaxes = inset_axes(ax1, width="30%", height="3%", loc=cloc, bbox_to_anchor=bbox)  
+    cax = f.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap_short),
+                     cax=cbaxes, orientation='horizontal',
+                     label=r'Growth Rate Ratio')
+    cbaxes.xaxis.set_label_position('top')
+    cax.ax.tick_params(size=0)
+    # ax1.legend(title='Growth rate ratio', loc=(0.25, 0.1), framealpha=0.1)
     ax1.set_ylim(0.0, 1.0)
     ax1.set_xlim(0.0, 1.0)
     
@@ -449,24 +467,19 @@ def multispecies_coexistence(nbrCellsEnd, fixateFraction):
     for i, density in enumerate(initDensity):
         vecStartAbundance = np.array([1, density])
         initCells = np.sum(vecStartAbundance)
-        # numDraws = initCells * ( 2 ** numGenerations - 1)
         numDraws = nbrCellsEnd - initCells
-        #dist = polya_two_species_distribution(numDraws, vecStartAbundance)
         dist = polya_probability_two_species(numDraws, vecStartAbundance)      
         x = np.linspace(0, 1.0, len(dist))
         
         averageRichness.append(initCells * np.sum(dist[x >= coexistence[0]]))
         
         ax1.plot(x, dist, color=colors[i], label=f"{initCells}")
+        
     ax1.set_xlabel('Final fraction of an initial species')
     ax1.set_ylabel('Probability')
     ax1.axvline(x = coexistence[0], color='k', ls=':')
-    #ax1.axvline(x = coexistence[1], color=settings.colors['eGFP'], ls=':')
-    #ax1.text(0.4, 0.1, 'Coexistence', color=settings.colors['coexistence'])
-    ax1.text(0.1, 0.1, 'Presence', color='k')
-    #ax1.text(0.825, 0.1, 'eGFP fix.', color=settings.colors['eGFP'])
+    ax1.text(0.375, 0.0018, 'Presence', color='k')
     ax1.legend(title='Number of species', framealpha=0.9)
-    # ax1.set_ylim(0.0, 1.0)
     ax1.set_xlim(0.0, 1.0)
     
     ax2.plot(initDensity + 1, averageRichness)
@@ -475,6 +488,7 @@ def multispecies_coexistence(nbrCellsEnd, fixateFraction):
     ax2.set_ylabel('Mean richness')
 
     filename = 'polya_richness'
+    plt.tight_layout()
     plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".pdf")
     plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".png")
         
@@ -569,25 +583,23 @@ if __name__ == '__main__':
         
     # testing_polya(100000, 100, np.array([2, 2]), np.array([1, 1]))
     
-    numGenerations = 10000
+    numGenerations = 2500
     fixateFraction = 1. / 5.
     
-    # initial_density_plot_A(numGenerations, fixateFraction)
-    
     # density
-    #initial_density_plot(numGenerations, fixateFraction)
-    
-    # density plot with selection
-    #initial_density_growth_plot(2000, numGenerations, fixateFraction, advantages)
+    # initial_density_plot(numGenerations, fixateFraction)
     
     # selective advantage
-    initAbundance = np.array([2, 2])
+    initAbundance = np.array([1, 1])
     fitnessDiff = np.logspace(0.0, 0.30102999566, 11)
     advantage = [1.1, 1.0]
-    # selection_advantage_plot(2000, numGenerations, initAbundance, fitnessDiff,
-    #                         fixateFraction)
+    selection_advantage_plot(20000, numGenerations, initAbundance, fitnessDiff,
+                            fixateFraction)
+    
+    # density plot with selection
+    initial_density_growth_plot(20000, numGenerations, fixateFraction, advantage)
     
     #distribution_time(initAbundance, fixateFraction)
     
-    multispecies_coexistence(200, fixateFraction)
+    # multispecies_coexistence(numGenerations, fixateFraction)
     
