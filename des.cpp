@@ -1203,7 +1203,7 @@ int place_cell(Environment &enviro, Bacteria &bact, int nbr_bact_strains,
       }
       // after checks are passed, actually initialize new cell
       stringstream ss;
-      ss << setw(countDigit(enviro.nbr_strains)) << setfill('0') << strain_nbr;
+      ss << std::setw(countDigit(enviro.nbr_strains)) << std::setfill('0') << strain_nbr;
       string label = ss.str();
       ABMagent* newBacteriaPntr = new ABMagent(&enviro, x, y, bact.radius,
                                               bact.max_length,
