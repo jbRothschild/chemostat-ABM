@@ -485,7 +485,7 @@ def distributionInitSpecies(filename, numberTrajectories):
     listDirectories = [72, 73, 74, 75, 76, 77, 78, 79]
     nbr = 70
     timestep = 1. / 12.
-    listDirectories = [1003, 1006, 1009, 1012]#, 1015, 1018, 1021]
+    listDirectories = [1003, 1006, 1009, 1012, 1015, 1018, 1021]
     nbr = 1000
     timestep = 1.
     violinPlot = []
@@ -495,21 +495,26 @@ def distributionInitSpecies(filename, numberTrajectories):
     
     initSpecies = [x - nbr for x in listDirectories]
 
-    # scatter plot
+    # scatter plot continuous
     cmap_name = 'viridis'
     cmap = matplotlib.cm.get_cmap(cmap_name)
     colors = [cmap(nbr) for nbr in
               np.linspace(0.0, 0.8, num=len(listDirectories))]
     custom_cycler = cycler(color=colors)
     
+    # colormap qualitative
+    colorsQ = [plt.cm.Set1(i) for i in range(len(initSpecies))]
+    iterColorsQ = iter(colorsQ)
+    
     def species2bands(numberSpecies):
         return (numberSpecies + 1.) / 2
     
     fig1, ax1 = plt.subplots(1)
+    fig3, ax3 = plt.subplots(1)
+    
     ax1.set_prop_cycle(custom_cycler)
-    for nbrSpecies, exp_nbr in enumerate(listDirectories):
+    for i, exp_nbr in enumerate(listDirectories):
         expDir = os.getcwd() + os.sep + 'data' + os.sep + f'c_exp_{exp_nbr}'
-        print(expDir)
         data = analysis.collect_data_array(expDir, numberTrajectories,
                                            timestep=timestep)
         lastTimepoint = data[:, :, -1]
@@ -521,7 +526,12 @@ def distributionInitSpecies(filename, numberTrajectories):
         biasViolinPlot.append(countRichnessBias)
         meanRich.append(np.mean(countRichness))
         meanRichBias.append(np.mean(countRichnessBias))
-        ax1.plot(richness, distRichness, label= 2 + nbrSpecies)
+        ax3.scatter([initSpecies[i]]*len(richness), richness,
+                    s=(15*distRichness)**2,
+                    color='gray',
+                    #color=next(iterColorsQ)
+                    )
+        ax1.plot(richness, distRichness, label= initSpecies[i])
     
     ax1.set_title(r"Diversity")
     ax1.set_xlabel(r'Number Initial Strains')
@@ -556,7 +566,8 @@ def distributionInitSpecies(filename, numberTrajectories):
                  + "_violin.png")    
     
     # boxplot
-    fig3, ax3 = plt.subplots(1)
+    #fig3, ax3 = plt.subplots(1)
+    """
     plots = ax3.boxplot(violinPlot, positions=initSpecies, widths=0.5,
                         patch_artist=True, showmeans=False, showfliers=False,
                         medianprops={"color": "r", "linewidth": 1.5},
@@ -564,21 +575,23 @@ def distributionInitSpecies(filename, numberTrajectories):
                                   "linewidth": 1.5},
                         whiskerprops={"color": "k", "linewidth": 1.5},
                         capprops={"color": "k", "linewidth": 1.5}, zorder=0)
+    """
     ax3.plot(initSpecies, meanRich, 'b', ls=settings.linestyles['sim'],
              zorder=10, label='mean')
     # ax3.plot(initSpecies, meanRichBias)
     
-    print(meanRich)
-    print(meanRichBias)
     
     # Set the color of the violin patches
     # for pc, color in zip(plots['boxes'], colors):
     #     pc.set_facecolor(color)
     
     ax3.set_title(r"Simulation")
-    ax3.set_xlabel(r'Number Initial Ancestors')
+    ax3.set_xlabel(r'Number Initial Strains')
     ax3.set_ylabel(r'Final Domains')
-    ax3.set_xlim(1, np.max(initSpecies) + 1)
+    ax3.set_xlim(0, np.max(initSpecies) + 2)
+    #ax3.set_xticks(initSpecies)
+    #for ticklabel, tickcolor in zip(ax3.get_xticklabels(), colorsQ):
+    #    ticklabel.set_color(tickcolor)
     ax3.set_ylim(0, 7)
     ax3.legend()
     
@@ -604,5 +617,5 @@ if __name__ == '__main__':
     densityComparison("compare_density", 5000, True)
     frictionComparison("compare_friction", 5000, True)
     
-    #distributionInitSpecies("lanes_formed", 5000)
+    distributionInitSpecies("lanes_formed", 5000)
     
