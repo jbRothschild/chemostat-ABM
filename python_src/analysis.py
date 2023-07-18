@@ -21,7 +21,6 @@ def collect_data_array(data_folder, nbr_simulations, nbr_lines=None,
                                            + os.sep + 'sim0_data.txt'))
     data = np.zeros((nbr_simulations, nbr_species, nbr_lines))
     for i in np.arange(0, nbr_simulations):
-        print(i)
         time = 0
         filename = data_folder + os.sep + 'sim' + str(i) + "_data.txt"
         if os.path.exists(filename):

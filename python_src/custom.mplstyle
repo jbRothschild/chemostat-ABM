@@ -195,4 +195,4 @@ legend.framealpha    : 0.12    # opacity of of legend frame
 #contour.corner_mask        : True   # True | False | legacy
 
 ### ERRORBAR PLOTS
-errorbar.capsize : 2             # length of end cap on error bars in pixels
+errorbar.capsize : 3             # length of end cap on error bars in pixels
