@@ -32,20 +32,29 @@ def timeDistributionPlot(filename, numberTrajectories):
 
     # figure for distribution of each species extinction times
     fig, ax = plt.subplots(1)
-    
-    num_bins = 20
-    n, x, _ = ax.hist(extinctions, num_bins,
+    num_bins = 40
+    span = (np.max(extinctions[0]) - np.min(extinctions[0]))
+    print(span, span / num_bins)
+    n, x, _ = ax.hist(extinctions[0], num_bins,
                       facecolor=settings.colors['single_fixate'],
+                      width = span / (num_bins),
                       # alpha=0.5,
                       density=True)
 
     density = stats.gaussian_kde(extinctions[0] + extinctions[1])
     x_smooth = np.linspace(x.min(), x.max(), 200)
     
-    from scipy import interpolate
-    y_spline = interpolate.CubicSpline(x, density(x))
-    plt.plot(x_smooth, y_spline(x_smooth), c=settings.colors['single_fixate'],
+    # from scipy import interpolate
+    # y_spline = interpolate.CubicSpline(x, density(x))
+    # plt.plot(x_smooth, y_spline(x_smooth), c=settings.colors['single_fixate'],
+    #         ls=settings.linestyles['sim'])
+    
+    # print(extinctions[0])
+    fit_alpha, fit_loc, fit_beta = stats.gamma.fit(np.array(extinctions[0]))
+    pdf_gamma = stats.gamma.pdf(x_smooth, fit_alpha, fit_loc, fit_beta) 
+    plt.plot(x_smooth, pdf_gamma, c=settings.colors['single_fixate'],
              ls=settings.linestyles['sim'])
+    
     ax.set_title(r"Simulation (2000 samples)")
     
     left, bottom, width, height = [0.55, 0.5, 0.4, 0.3]
@@ -71,11 +80,15 @@ def timeDistributionPlot(filename, numberTrajectories):
     # plt.show()
     return 0
 
-def growthComparison(filename, numberTrajectories, bootstrap = False):
+def growthComparison(filename=None, numberTrajectories=0, bootstrap = False):
     listDirectories = [30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60]
     gfpFixateFraction = []
     mchFixateFraction = []
     coexistFraction = []
+    
+    yerrGfp = []
+    yerrMch = []
+    yerrCoexist = []
     
     listDirectories.reverse()
     
@@ -123,9 +136,9 @@ def growthComparison(filename, numberTrajectories, bootstrap = False):
         mchFixateFraction.append(np.mean(bootMch))
         coexistFraction.append(np.mean(bootCoexist))
         if bootstrap:
-            yerrGfp = np.std(bootGfp)
-            yerrMch = np.std(bootGfp)
-            yerrCoexist = np.std(bootCoexist)
+            yerrGfp.append(np.std(bootGfp))
+            yerrMch.append(np.std(bootGfp))
+            yerrCoexist.append(np.std(bootCoexist))
         else:
             yerrGfp = 0
             yerrMch = 0
@@ -162,10 +175,12 @@ def growthComparison(filename, numberTrajectories, bootstrap = False):
     
     plt.legend()
     fig.tight_layout()
-    plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".pdf")
-    plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".png")
+    if filename is not None:
+        plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".pdf")
+        plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".png")
     # plt.show()
-    return 0
+    return growthRatio, coexistFraction, mchFixateFraction, gfpFixateFraction,\
+        yerrCoexist, yerrMch, yerrGfp
 
 def geometryComparison(filename, numberTrajectories, bootstrap=False):
     #listDirectories = [356, 376, 396, 416, 436, 456, 476, 496, 516, 536, 556]
@@ -177,6 +192,10 @@ def geometryComparison(filename, numberTrajectories, bootstrap=False):
     gfpFixateFraction = []
     mchFixateFraction = []
     coexistFraction = []
+    
+    yerrGfp = []
+    yerrMch = []
+    yerrCoexist = []
     
     for exp_nbr in listDirectories:
         numberCoexist = 0.
@@ -222,9 +241,9 @@ def geometryComparison(filename, numberTrajectories, bootstrap=False):
         mchFixateFraction.append(np.mean(bootMch))
         coexistFraction.append(np.mean(bootCoexist))
         if bootstrap:
-            yerrGfp = np.std(bootGfp)
-            yerrMch = np.std(bootGfp)
-            yerrCoexist = np.std(bootCoexist)
+            yerrGfp.append(np.std(bootGfp))
+            yerrMch.append(np.std(bootGfp))
+            yerrCoexist.append(np.std(bootCoexist))
         else:
             yerrGfp = 0
             yerrMch = 0
@@ -273,7 +292,7 @@ def geometryComparison(filename, numberTrajectories, bootstrap=False):
     return 0
 
 
-def densityComparison(filename, numberTrajectories, bootstrap=False):
+def densityComparison(filename=None, numberTrajectories=0, bootstrap=False):
     listDirectories = [1, 5, 9, 13, 17]
     listDirectories = [101, 105, 109, 113, 117, 121]
     diff = 100
@@ -282,6 +301,10 @@ def densityComparison(filename, numberTrajectories, bootstrap=False):
     gfpFixateFraction = []
     mchFixateFraction = []
     coexistFraction = []
+    
+    yerrGfp = []
+    yerrMch = []
+    yerrCoexist = []
     
     for exp_nbr in listDirectories:
         numberCoexist = 0.
@@ -326,9 +349,9 @@ def densityComparison(filename, numberTrajectories, bootstrap=False):
         mchFixateFraction.append(np.mean(bootMch))
         coexistFraction.append(np.mean(bootCoexist))
         if bootstrap:
-            yerrGfp = np.std(bootGfp)
-            yerrMch = np.std(bootGfp)
-            yerrCoexist = np.std(bootCoexist)
+            yerrGfp.append(np.std(bootGfp))
+            yerrMch.append(np.std(bootGfp))
+            yerrCoexist.append(np.std(bootCoexist))
         else:
             yerrGfp = 0
             yerrMch = 0
@@ -358,7 +381,7 @@ def densityComparison(filename, numberTrajectories, bootstrap=False):
                  marker=settings.markers['mCherry'],
                  label=settings.labels['mCherry'],
                  elinewidth=1)
-    ax1.set_title(r"Simulation")
+    ax1.set_title(r"Simulation (N=5000)")
     ax1.set_xlabel(r'Initial Strain Abundance')
     ax1.set_ylabel(r'Fraction')
     ax1.set_ylim(0.0, 1.0)
@@ -366,12 +389,14 @@ def densityComparison(filename, numberTrajectories, bootstrap=False):
     
     plt.legend()
     fig.tight_layout()
-    plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + add_title
-                + ".pdf")
-    plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + add_title
-                + ".png")
+    if filename is not None:
+        plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + add_title
+                    + ".pdf")
+        plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + add_title
+                    + ".png")
     # plt.show()
-    return 0
+    return density, coexistFraction, mchFixateFraction, gfpFixateFraction,\
+        yerrCoexist, yerrMch, yerrGfp
 
 
 def frictionComparison(filename, numberTrajectories, bootstrap=False):
@@ -381,13 +406,17 @@ def frictionComparison(filename, numberTrajectories, bootstrap=False):
     listDirectories = [401, 402, 405, 410, 420]
     diff = 400
     add_title = r'_growthdiff'
-    #listDirectories = [901, 902, 905, 910, 920]
-    #diff = 900
-    #add_title = r'_growthdiff_coccus'
+    listDirectories = [901, 902, 905, 910, 920]
+    diff = 900
+    add_title = r'_growthdiff_coccus'
     
     gfpFixateFraction = []
     mchFixateFraction = []
     coexistFraction = []
+     
+    yerrGfp = []
+    yerrMch = []
+    yerrCoexist = []
     
     for exp_nbr in listDirectories:
         numberCoexist = 0.
@@ -432,9 +461,9 @@ def frictionComparison(filename, numberTrajectories, bootstrap=False):
         mchFixateFraction.append(np.mean(bootMch))
         coexistFraction.append(np.mean(bootCoexist))
         if bootstrap:
-            yerrGfp = np.std(bootGfp)
-            yerrMch = np.std(bootGfp)
-            yerrCoexist = np.std(bootCoexist)
+            yerrGfp.append(np.std(bootGfp))
+            yerrMch.append(np.std(bootGfp))
+            yerrCoexist.append(np.std(bootCoexist))
         else:
             yerrGfp = 0
             yerrMch = 0
@@ -466,7 +495,7 @@ def frictionComparison(filename, numberTrajectories, bootstrap=False):
                  elinewidth=1)
     ax1.set_title(r'Simulation')
     ax1.set_xlabel(r'Damping Ratio, $\zeta=\gamma_{\mathrm{mCh}}/\gamma_{\mathrm{eGFP}}$')
-    #ax1.set_xlabel(r'Damping Coefficient, $\gamma$')
+    ax1.set_xlabel(r'Damping Coefficient, $\gamma$')
     ax1.set_ylabel(r'Fraction')
     ax1.set_ylim(0.0, 1.0)
     ax1.set_xlim(1, 10)
@@ -612,10 +641,10 @@ if __name__ == '__main__':
         os.makedirs(directory)
     
     timeDistributionPlot("time_distribution", 5000)
-    growthComparison("compare_growth_rate", 5000, True)
-    geometryComparison("compare_geometry", 5000, True)
+    #growthComparison("compare_growth_rate", 5000, True)
+    #geometryComparison("compare_geometry", 5000, True)
     densityComparison("compare_density", 5000, True)
-    frictionComparison("compare_friction", 5000, True)
+    #frictionComparison("compare_friction", 5000, True)
     
-    distributionInitSpecies("lanes_formed", 5000)
+    #distributionInitSpecies("lanes_formed", 5000)
     

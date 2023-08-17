@@ -10,6 +10,7 @@ import os
 
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from matplotlib.colors import Normalize #color in log the maps
+from manuscript import growthComparison, densityComparison
 
 random.seed()
 plt.style.use('python_src/custom.mplstyle')
@@ -289,6 +290,10 @@ def initial_density_growth_plot(numTrials, numGenerations, fixateFraction,
     cmap = matplotlib.cm.get_cmap(cmapname)
     colors = [cmap(nbr) for nbr in np.linspace(0.0, 0.8, num=len(initDensity))]
     
+    densityC, coexistFraction, mchFixateFraction, gfpFixateFraction,\
+    yerrCoexist, yerrMch, yerrGfp = densityComparison(numberTrajectories=5000,
+                                                     bootstrap=True)
+    
     # define figure
     f, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.0, 2.5))
     vecAdvantage = np.array(advantages)
@@ -326,6 +331,22 @@ def initial_density_growth_plot(numTrials, numGenerations, fixateFraction,
     ax1.set_ylim(0.0, 0.3)
     ax1.set_xlim(0.0, 1.0)
     
+    ax2.fill_between(densityC,
+                     np.array(coexistFraction) - np.array(yerrCoexist),
+                     np.array(coexistFraction) + np.array(yerrCoexist),
+                     color=settings.colors['coexistence'],
+                     alpha=0.3)
+    ax2.fill_between(densityC,
+                     np.array(mchFixateFraction) - np.array(yerrMch),
+                     np.array(mchFixateFraction) + np.array(yerrMch),
+                     color=settings.colors['mCherry'],
+                     alpha=0.3)
+    ax2.fill_between(densityC,
+                     np.array(gfpFixateFraction) - np.array(yerrGfp),
+                     np.array(gfpFixateFraction) + np.array(yerrGfp),
+                     color=settings.colors['eGFP'],
+                     alpha=0.3)
+    
     # plot for probability of certain densities
     ax2.plot(initDensity, probDensityLow, color=settings.colors['mCherry'],
              ls=settings.linestyles['sim'],
@@ -343,7 +364,7 @@ def initial_density_growth_plot(numTrials, numGenerations, fixateFraction,
              label=settings.labels['coexistence'])
     
     # plot settings
-    ax2.set_xlabel('Initial abundance of the species')
+    ax2.set_xlabel('Initial Strain Abundance')
     ax2.set_ylabel('Probability')
     ax2.legend()
     ax2.set_ylim(0.0, 1.0)
@@ -380,6 +401,10 @@ def selection_advantage_plot(numTrials, numGenerations, vecStartAbundance,
                                                num=len(advantage))]
     short_range = cmap(np.linspace(range_cmap[0], range_cmap[1], cmap.N))
     cmap_short = matplotlib.colors.LinearSegmentedColormap.from_list('cut_map', short_range)
+    
+    growthRatio, coexistFraction, mchFixateFraction, gfpFixateFraction,\
+    yerrCoexist, yerrMch, yerrGfp = growthComparison(numberTrajectories=5000,
+                                                     bootstrap=True)
     
     f, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.0, 2.5))
     for i, fitness in enumerate(advantage):
@@ -423,6 +448,22 @@ def selection_advantage_plot(numTrials, numGenerations, vecStartAbundance,
     ax1.set_ylim(0.0, 1.0)
     ax1.set_xlim(0.0, 1.0)
     
+    ax2.fill_between(growthRatio,
+                     np.array(coexistFraction) - np.array(yerrCoexist),
+                     np.array(coexistFraction) + np.array(yerrCoexist),
+                     color=settings.colors['coexistence'],
+                     alpha=0.3)
+    ax2.fill_between(growthRatio,
+                     np.array(mchFixateFraction) - np.array(yerrMch),
+                     np.array(mchFixateFraction) + np.array(yerrMch),
+                     color=settings.colors['mCherry'],
+                     alpha=0.3)
+    ax2.fill_between(growthRatio,
+                     np.array(gfpFixateFraction) - np.array(yerrGfp),
+                     np.array(gfpFixateFraction) + np.array(yerrGfp),
+                     color=settings.colors['eGFP'],
+                     alpha=0.3)
+    
     # plotting fixations and coexistence fractions for each fitness ratio 
     ax2.plot(advantage, probDensityLow, color=settings.colors['mCherry'],
              ls=settings.linestyles['sim'],
@@ -438,7 +479,7 @@ def selection_advantage_plot(numTrials, numGenerations, vecStartAbundance,
              marker=settings.markers['coexistence'],
              label=settings.labels['coexistence'])
     ax2.legend()
-    ax2.set_xlabel('Growth rate ratio (eGFP/mCherry)')
+    ax2.set_xlabel('Growth Rate Ratio (eGFP/mCherry)')
     ax2.set_ylabel('Probability')
     ax2.set_ylim(0.0, 1.0)
     # ax2.set_xlim(1.0, 2.0)
@@ -484,8 +525,8 @@ def multispecies_coexistence(nbrCellsEnd, fixateFraction):
     
     ax2.plot(initDensity + 1, averageRichness)
 
-    ax2.set_xlabel('Initial number of the species')
-    ax2.set_ylabel('Mean richness')
+    ax2.set_xlabel('Initial Strain Abundance')
+    ax2.set_ylabel('Mean Richness')
 
     filename = 'polya_richness'
     plt.tight_layout()
