@@ -166,7 +166,7 @@ class Environment
     double save_time;
     double mass = 1.0; // 1/5
     double beta = 0.8;
-    double k_n = 45000000.0; // 4000000.0
+    double k_n = 15000000.0; // 4000000.0
     double gamma_n = 0.0; // 0.00
     double gamma_t = 0.0; // 0.00
     double damping_lin = 200.0 * 60; // 12000
@@ -607,10 +607,10 @@ void ABMagent::move(double dt, double damping_lin, double damping_tor)
   // reposition cell and re-orient
   double x_prev = x;
   double y_prev = y;
-  x += dt * force_x / ( reduced_mass * damping * damping_lin * length );
-  y += dt * force_y / ( reduced_mass * damping * damping_lin * length );
+  x += dt * force_x / ( reduced_mass * damping * damping_lin);
+  y += dt * force_y / ( reduced_mass * damping * damping_lin);
   double inertia_dt = reduced_mass * pow(length, 2.0) / 12.;
-  angle += dt * torque / ( inertia_dt * damping * damping_tor * length );
+  angle += dt * torque / ( inertia_dt * damping * damping_tor);
 
   // reset forces to zero for next round
   force_x = 0.0;
