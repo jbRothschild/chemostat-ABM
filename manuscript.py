@@ -34,7 +34,6 @@ def timeDistributionPlot(filename, numberTrajectories):
     fig, ax = plt.subplots(1)
     num_bins = 40
     span = (np.max(extinctions[0]) - np.min(extinctions[0]))
-    print(span, span / num_bins)
     n, x, _ = ax.hist(extinctions[0], num_bins,
                       facecolor=settings.colors['single_fixate'],
                       width = span / (num_bins),
@@ -55,7 +54,7 @@ def timeDistributionPlot(filename, numberTrajectories):
     plt.plot(x_smooth, pdf_gamma, c=settings.colors['single_fixate'],
              ls=settings.linestyles['sim'])
     
-    ax.set_title(r"Simulation (2000 samples)")
+    ax.set_title(r"Simulation (5000 samples)")
     
     left, bottom, width, height = [0.55, 0.5, 0.4, 0.3]
     ax2 = fig.add_axes([left, bottom, width, height])
@@ -152,6 +151,7 @@ def growthComparison(filename=None, numberTrajectories=0, bootstrap = False):
                  ecolor='k',
                  marker=settings.markers['coexistence'],
                  label=settings.labels['coexistence'],
+                 markeredgecolor='k',
                  elinewidth=1)
     ax1.errorbar(growthRatio, gfpFixateFraction, yerr=yerrGfp,
                  ls=settings.linestyles['sim'],
@@ -159,6 +159,7 @@ def growthComparison(filename=None, numberTrajectories=0, bootstrap = False):
                  ecolor='k',
                  marker=settings.markers['eGFP'],
                  label=settings.labels['eGFP'],
+                 markeredgecolor='k',
                  elinewidth=1)
     ax1.errorbar(growthRatio, mchFixateFraction, yerr=yerrMch,
                  ls=settings.linestyles['sim'],
@@ -166,6 +167,7 @@ def growthComparison(filename=None, numberTrajectories=0, bootstrap = False):
                  ecolor='k',
                  marker=settings.markers['mCherry'],
                  label=settings.labels['mCherry'],
+                 markeredgecolor='k',
                  elinewidth=1)
     ax1.set_title(r"Simulation Outcomes")
     ax1.set_xlabel(r'Growth Rate Ratio (eGFP/mCherry)')
@@ -173,7 +175,9 @@ def growthComparison(filename=None, numberTrajectories=0, bootstrap = False):
     ax1.set_ylim(0.0, 1.0)
     ax1.set_xlim(0.9, 2.1)
     
-    plt.legend()
+    legend = plt.legend()
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     fig.tight_layout()
     if filename is not None:
         plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".pdf")
@@ -259,6 +263,7 @@ def geometryComparison(filename, numberTrajectories, bootstrap=False):
                  ecolor='k',
                  marker=settings.markers['coexistence'],
                  label=settings.labels['coexistence'],
+                 markeredgecolor='k',
                  elinewidth=1)
     ax1.errorbar(lengthRatio, np.flip(gfpFixateFraction),
                  yerr=np.flip(yerrGfp),
@@ -267,6 +272,7 @@ def geometryComparison(filename, numberTrajectories, bootstrap=False):
                  ecolor='k',
                  marker=settings.markers['eGFP'],
                  label=settings.labels['eGFP'],
+                 markeredgecolor='k',
                  elinewidth=1)
     ax1.errorbar(lengthRatio, np.flip(mchFixateFraction),
                  yerr=np.flip(yerrMch),
@@ -275,6 +281,7 @@ def geometryComparison(filename, numberTrajectories, bootstrap=False):
                  ecolor='k',
                  marker=settings.markers['mCherry'],
                  label=settings.labels['mCherry'],
+                 markeredgecolor='k',
                  elinewidth=1)
     ax1.set_title(r'Simulation')
     ax1.set_xlabel(r'Relative Length mCherry')
@@ -282,7 +289,9 @@ def geometryComparison(filename, numberTrajectories, bootstrap=False):
     ax1.set_ylim(0.0, 1.0)
     ax1.set_xlim(np.min(lengthRatio) - 0.1, np.max(lengthRatio) + 0.1)
     
-    plt.legend()
+    legend = plt.legend()
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     fig.tight_layout()
     plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + add_title
                 + ".pdf")
@@ -360,34 +369,39 @@ def densityComparison(filename=None, numberTrajectories=0, bootstrap=False):
 
     density = [x - diff for x in listDirectories]
     fig, ax1 = plt.subplots(1)
-    ax1.errorbar(density, coexistFraction, yerr=yerrCoexist,
+    ax1.errorbar(2 * np.array(density), coexistFraction, yerr=yerrCoexist,
                  ls=settings.linestyles['sim'],
                  color=settings.colors['coexistence'],
                  ecolor='k',
                  marker=settings.markers['coexistence'],
                  label=settings.labels['coexistence'],
+                 markeredgecolor='k',
                  elinewidth=1)
-    ax1.errorbar(density, gfpFixateFraction, yerr=yerrGfp,
+    ax1.errorbar(2 * np.array(density), gfpFixateFraction, yerr=yerrGfp,
                  ls=settings.linestyles['sim'],
                  color=settings.colors['eGFP'],
                  ecolor='k',
                  marker=settings.markers['eGFP'],
                  label=settings.labels['eGFP'],
+                 markeredgecolor='k',
                  elinewidth=1)
-    ax1.errorbar(density, mchFixateFraction, yerr=yerrMch,
+    ax1.errorbar(2 * np.array(density), mchFixateFraction, yerr=yerrMch,
                  ls=settings.linestyles['sim'],
                  color=settings.colors['mCherry'],
                  ecolor='k',
                  marker=settings.markers['mCherry'],
                  label=settings.labels['mCherry'],
+                 markeredgecolor='k',
                  elinewidth=1)
-    ax1.set_title(r"Simulation (N=5000)")
-    ax1.set_xlabel(r'Initial Strain Abundance')
+    ax1.set_title(r"Simulation")
+    ax1.set_xlabel(r'Initial Total Abundance')
     ax1.set_ylabel(r'Fraction')
     ax1.set_ylim(0.0, 1.0)
-    ax1.set_xlim(0, 21)
+    ax1.set_xlim(0, 41)
     
-    plt.legend()
+    legend = plt.legend()
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     fig.tight_layout()
     if filename is not None:
         plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + add_title
@@ -399,16 +413,19 @@ def densityComparison(filename=None, numberTrajectories=0, bootstrap=False):
         yerrCoexist, yerrMch, yerrGfp
 
 
-def frictionComparison(filename, numberTrajectories, bootstrap=False):
+def frictionComparison(filename, numberTrajectories, bootstrap=False, diff=400):
+    #diff = 200
     listDirectories = [201, 202, 205, 210, 220]
-    diff = 200
     add_title = r''
-    listDirectories = [401, 402, 405, 410, 420]
+    
     diff = 400
-    add_title = r'_growthdiff'
-    listDirectories = [901, 902, 905, 910, 920]
     diff = 900
-    add_title = r'_growthdiff_coccus'
+    if diff == 400:
+        add_title = r'_growthdiff'
+        listDirectories = [401, 402, 405, 410, 420]
+    elif diff == 900:
+        listDirectories = [901, 902, 905, 910, 920]
+        add_title = r'_growthdiff_coccus'
     
     gfpFixateFraction = []
     mchFixateFraction = []
@@ -478,6 +495,7 @@ def frictionComparison(filename, numberTrajectories, bootstrap=False):
                  ecolor='k',
                  marker=settings.markers['coexistence'],
                  label=settings.labels['coexistence'],
+                 markeredgecolor='k',
                  elinewidth=1)
     ax1.errorbar(lengthRatio, gfpFixateFraction, yerr=yerrGfp,
                  ls=settings.linestyles['sim'],
@@ -485,6 +503,7 @@ def frictionComparison(filename, numberTrajectories, bootstrap=False):
                  ecolor='k',
                  marker=settings.markers['eGFP'],
                  label=settings.labels['eGFP'],
+                 markeredgecolor='k',
                  elinewidth=1)
     ax1.errorbar(lengthRatio, mchFixateFraction, yerr=yerrMch,
                  ls=settings.linestyles['sim'],
@@ -492,16 +511,22 @@ def frictionComparison(filename, numberTrajectories, bootstrap=False):
                  ecolor='k',
                  marker=settings.markers['mCherry'],
                  label=settings.labels['mCherry'],
+                 markeredgecolor='k',
                  elinewidth=1)
-    ax1.set_title(r'Simulation')
-    ax1.set_xlabel(r'Damping Ratio, $\zeta=\gamma_{\mathrm{mCh}}/\gamma_{\mathrm{eGFP}}$')
-    ax1.set_xlabel(r'Damping Coefficient, $\gamma$')
+    if diff == 400:
+        ax1.set_title(r'Simulation (Mixed)')
+        ax1.set_xlabel(r'Damping Ratio $\zeta=\gamma_{\mathrm{mCh}}/\gamma_{\mathrm{eGFP}}$')
+    elif diff == 900:
+        ax1.set_title(r'Simulation (Cocci)')
+        ax1.set_xlabel(r'Damping Coefficient $\gamma$')
     ax1.set_ylabel(r'Fraction')
     ax1.set_ylim(0.0, 1.0)
-    ax1.set_xlim(1, 10)
+    ax1.set_xlim(0, 12)
     # ax1.set_xlim(np.min(lengthRatio) - 0.1, np.max(lengthRatio) + 0.1)
     
-    plt.legend()
+    legend = plt.legend()
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     fig.tight_layout()
     plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + add_title
                 + ".pdf")
@@ -560,15 +585,17 @@ def distributionInitSpecies(filename, numberTrajectories):
                     color='gray',
                     #color=next(iterColorsQ)
                     )
-        ax1.plot(richness, distRichness, label= initSpecies[i])
+        ax1.plot( np.array(richness), distRichness, label= initSpecies[i])
     
     ax1.set_title(r"Diversity")
-    ax1.set_xlabel(r'Number Initial Strains')
+    ax1.set_xlabel(r'Initial Strain Abundance')
     ax1.set_ylabel(r'Fraction')
     ax1.set_ylim(0.0, 0.8)
     ax1.set_xlim(0, 9)
     
-    ax1.legend(title='\# initial strain')
+    legend = ax1.legend(title='\# initial strain')
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     fig1.tight_layout()
     fig1.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename
                  + "_dist.pdf")
@@ -585,8 +612,8 @@ def distributionInitSpecies(filename, numberTrajectories):
         pc.set_facecolor(color)
     
     ax2.set_title(r"Diversity")
-    ax2.set_xlabel(r'Number Initial Strains')
-    ax2.set_ylabel(r'Number Final Strains')
+    ax2.set_xlabel(r'Number of Initial Strains')
+    ax2.set_ylabel(r'Number of Final Strains')
     
     fig2.tight_layout()
     fig2.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename
@@ -606,7 +633,7 @@ def distributionInitSpecies(filename, numberTrajectories):
                         capprops={"color": "k", "linewidth": 1.5}, zorder=0)
     """
     ax3.plot(initSpecies, meanRich, 'b', ls=settings.linestyles['sim'],
-             zorder=10, label='mean')
+             zorder=10, label='Mean')
     # ax3.plot(initSpecies, meanRichBias)
     
     
@@ -615,14 +642,17 @@ def distributionInitSpecies(filename, numberTrajectories):
     #     pc.set_facecolor(color)
     
     ax3.set_title(r"Simulation")
-    ax3.set_xlabel(r'Number Initial Strains')
+    ax3.set_xlabel(r'Number of Initial Strains')
     ax3.set_ylabel(r'Final Domains')
     ax3.set_xlim(0, np.max(initSpecies) + 2)
     #ax3.set_xticks(initSpecies)
     #for ticklabel, tickcolor in zip(ax3.get_xticklabels(), colorsQ):
     #    ticklabel.set_color(tickcolor)
     ax3.set_ylim(0, 7)
-    ax3.legend()
+    legend = ax3.legend()
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
+    
     
     fig3.tight_layout()
     fig3.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename
@@ -641,10 +671,11 @@ if __name__ == '__main__':
         os.makedirs(directory)
     
     timeDistributionPlot("time_distribution", 5000)
-    #growthComparison("compare_growth_rate", 5000, True)
-    #geometryComparison("compare_geometry", 5000, True)
+    growthComparison("compare_growth_rate", 5000, True)
+    geometryComparison("compare_geometry", 5000, True)
     densityComparison("compare_density", 5000, True)
-    #frictionComparison("compare_friction", 5000, True)
+    frictionComparison("compare_friction", 5000, True, diff=400)
+    frictionComparison("compare_friction", 5000, True, diff=900)
     
-    #distributionInitSpecies("lanes_formed", 5000)
+    distributionInitSpecies("lanes_formed", 5000)
     

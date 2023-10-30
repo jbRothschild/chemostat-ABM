@@ -8,6 +8,6 @@ colors = {'coexistence' : "#ffdb1e", 'eGFP' :  "#7aead5", 'mCherry' : "#d600d6",
 
 markers = {'coexistence' : '^', 'eGFP' : 's', 'mCherry' : 'o'}
 
-labels = {'coexistence' : 'coexistence', 'eGFP' : 'eGFP fixation',
-          'mCherry' : 'mCherry fixation'}
+labels = {'coexistence' : 'Coexistence', 'eGFP' : 'eGFP fix.',
+          'mCherry' : 'mCherry fix.'}
 

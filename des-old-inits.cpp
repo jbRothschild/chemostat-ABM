@@ -7,7 +7,7 @@
 *       in this space until they are removed from and of the edges.
 *
 * PUBLIC FUNCTIONS :
-*       // TODO : Write out class involved and also comment these functions
+*       // TODO: 
 *
 * NOTES :
 *       If you want to take the simulations and change the number of bacteria
@@ -256,24 +256,18 @@ class Environment
     void add(ABMagent* agent);
     void move(ABMagent* agent, double x_prev, double y_prev);
     void applyForceCell2Cell(ABMagent* agent, ABMagent* other,
-                             double point_agent_x, double point_agent_y,
-                             double point_other_x, double point_other_y,
-                             double dist
-                             );
-    void applyForceCell2HorizWall(ABMagent* agent, double point_agent_x,
-                                  double point_agent_y, double point_wall_y,
-                                  double separation
-                                 );
-    void applyForceCell2VertiWall(ABMagent* agent, double point_agent_x,
-                                  double point_agent_y, double point_wall_x,
-                                  double separation
-                                 );
+                          double point_agent_x, double point_agent_y,
+                          double point_other_x, double point_other_y,
+                          double dist
+                       );
+    void applyForceCell2Wall(ABMagent* agent, double point_agent_x,
+                          double point_agent_y, double point_wall_y,
+                          double separation
+                      );
     void handleAgent(ABMagent* agent, ABMagent* other);
-    void handleAgentHorizWall(ABMagent* agent, double top);
-    void handleAgentVertiWall(ABMagent* agent, double top);
+    void handleAgentWall(ABMagent* agent, double top);
     void handleCell(int x, int y);
-    void handleCellHorizWall(int x, int y, double top);
-    void handleCellVertiWall(int x, int y, double top);
+    void handleCellWall(int x, int y, double top);
     void handleCellMoveAndGrow(int x, int y);
     void handleCellSplit(int x, int y);
     void handleInteractions();
@@ -738,7 +732,7 @@ void Environment::applyForceCell2Cell
 }
 
 
-void Environment::applyForceCell2HorizWall
+void Environment::applyForceCell2Wall
 (
   ABMagent* agent,
   double point_agent_x,
@@ -796,66 +790,6 @@ void Environment::applyForceCell2HorizWall
   agent->addForce(point_agent_x, point_agent_y, ext_force_x, ext_force_y);
   // cout << "Walls definitely happen!";
 }
-
-void Environment::applyForceCell2VertiWall
-(
-  ABMagent* agent,
-  double point_agent_x,
-  double point_agent_y,
-  double point_wall_x,
-  double separation
-)
-{
-  double M_e = mass / 2.0;
-  double delta = separation;
-  double ext_force_x = 0.0;
-  double ext_force_y = 0.0;
-  double normal_x;
-  double normal_y;
-  double vel_delta_x;
-  double vel_delta_y;
-  double vel_norm;
-  double tngt_x = 0.0;
-  double tngt_y = 0.0;
-  double vel_tngt_x;
-  double vel_tngt_y;
-  double vel_tngt;
-  double norm_force = 0.0;
-  double tngt_force = 0.0; // tangential force
-  double max_friction;
-  double friction;
-
-  normal_x = ( point_agent_x - point_wall_x) / separation;
-  normal_y = 0.0;
-
-  vel_delta_x = agent->vel_x + agent->vel_angle * ( point_agent_y - agent->y );
-  vel_delta_y = agent->vel_y - agent->vel_angle * ( point_agent_x - agent->x );
-
-  // Calculating the normal force
-  vel_norm = vel_delta_x * normal_x + vel_delta_y * normal_y;
-  norm_force = k_n * pow(delta, 1.5) - gamma_n * M_e * delta * vel_norm;
-
-  // Calculating tangential force
-  /*
-  vel_tngt_x = vel_delta_x - vel_norm * normal_x;
-  vel_tngt_y = vel_delta_y - vel_norm * normal_y;
-  vel_tngt = sqrt( pow(vel_tngt_x, 2.0) + pow(vel_tngt_y, 2.0) );
-  if ( vel_tngt != 0.0)
-  {
-    tngt_x = vel_tngt_x / vel_tngt;
-    tngt_y = vel_tngt_x / vel_tngt;
-    friction = gamma_t * M_e * pow(delta, 0.5) * vel_tngt;
-    max_friction = mu_cw * norm_force;
-    tngt_force = - min(max_friction, friction);
-  }
-  */
-  ext_force_x = norm_force * normal_x + tngt_force * tngt_x;
-  ext_force_y = norm_force * normal_y + tngt_force * tngt_y;
-
-  agent->addForce(point_agent_x, point_agent_y, ext_force_x, ext_force_y);
-  // cout << "Walls definitely happen!";
-}
-
 
 void Environment::handleAgent(ABMagent* agent, ABMagent* other)
 {
@@ -944,7 +878,7 @@ void Environment::handleAgent(ABMagent* agent, ABMagent* other)
 }
 
 
-void Environment::handleAgentHorizWall(ABMagent* agent, double top)
+void Environment::handleAgentWall(ABMagent* agent, double top)
 {
   double vector_agent_y = ( agent->length - 2.0 * agent->radius )
                           * sin(agent->angle) / 2.0;
@@ -952,7 +886,6 @@ void Environment::handleAgentHorizWall(ABMagent* agent, double top)
                           * cos(agent->angle) / 2.0;
   double point_agent_x;
   double point_agent_y;
-
   if ( top == 1.0 )
   {
     double sep_cell_wall = agent->y + abs(vector_agent_y) + agent->radius
@@ -961,10 +894,8 @@ void Environment::handleAgentHorizWall(ABMagent* agent, double top)
       {
         point_agent_y = agent->y + abs(vector_agent_y);
         point_agent_x = agent->x + sgn(vector_agent_y)*vector_agent_x;
-        applyForceCell2HorizWall(agent, point_agent_x, point_agent_y, 
-                                 CHANNEL_HEIGHT,
-                                 sep_cell_wall
-                                );
+        applyForceCell2Wall(agent, point_agent_x, point_agent_y, CHANNEL_HEIGHT,
+                           sep_cell_wall);
       }
   }
   if ( top == -1.0 )
@@ -974,45 +905,8 @@ void Environment::handleAgentHorizWall(ABMagent* agent, double top)
       {
         point_agent_y = agent->y - abs(vector_agent_y);
         point_agent_x = agent->x - sgn(vector_agent_y)*vector_agent_x;
-        applyForceCell2HorizWall(agent, point_agent_x, point_agent_y, 0.0,
+        applyForceCell2Wall(agent, point_agent_x, point_agent_y, 0.0,
                            sep_cell_wall);
-      }
-  }
-  return;
-}
-
-void Environment::handleAgentVertiWall(ABMagent* agent, double right)
-{
-  double vector_agent_y = ( agent->length - 2.0 * agent->radius )
-                          * sin(agent->angle) / 2.0;
-  double vector_agent_x = ( agent->length - 2.0 * agent->radius )
-                          * cos(agent->angle) / 2.0;
-  double point_agent_x;
-  double point_agent_y;
-  
-  if ( right == 1.0 )
-  {
-    double sep_cell_wall = agent->x + abs(vector_agent_x) + agent->radius
-                           - CHANNEL_HEIGHT;
-    if ( sep_cell_wall > 0.0 )
-      {
-        point_agent_y = agent->y + abs(vector_agent_y);
-        point_agent_x = agent->x + sgn(vector_agent_y)*vector_agent_x;
-        applyForceCell2VertiWall(agent, point_agent_x, point_agent_y,
-                                 CHANNEL_WIDTH,
-                                 sep_cell_wall
-                                );
-      }
-  }
-  if ( right == -1.0 )
-  {
-    double sep_cell_wall =  - agent->x + abs(vector_agent_x) + agent->radius;
-    if ( sep_cell_wall > 0.0 )
-      {
-        point_agent_y = agent->y - abs(vector_agent_y);
-        point_agent_x = agent->x - sgn(vector_agent_y)*vector_agent_x;
-        applyForceCell2VertiWall(agent, point_agent_x, point_agent_y, 0.0,
-                                 sep_cell_wall);
       }
   }
   return;
@@ -1035,27 +929,14 @@ void Environment::handleCell(int x, int y)
   }
 }
 
-void Environment::handleCellHorizWall(int x, int y, double top)
+void Environment::handleCellWall(int x, int y, double top)
 {
   // top is 1.0 if top, -1.0 if bottom
   ABMagent* agent = grid_[x][y];
   while (agent != NULL)
   {
     // Handle other agents in this cell.
-    handleAgentHorizWall(agent, top);
-    agent = agent->next_;
-  }
-}
-
-
-void Environment::handleCellVertiWall(int x, int y, double right)
-{
-  // top is 1.0 if left, -1.0 if right
-  ABMagent* agent = grid_[x][y];
-  while (agent != NULL)
-  {
-    // Handle other agents in this cell.
-    handleAgentVertiWall(agent, right);
+    handleAgentWall(agent, top);
     agent = agent->next_;
   }
 }
@@ -1091,8 +972,7 @@ void Environment::handleCellSplit(int x, int y)
 
 
 void Environment::handleInteractions()
-{ 
-  // Check each cell interacting with other cells
+{
   for (int x = 1; x < NUM_CELLS_WIDTH; x++)
   {
     for (int y = 1; y < NUM_CELLS_HEIGHT; y++)
@@ -1100,18 +980,11 @@ void Environment::handleInteractions()
       handleCell(x, y);
     }
   }
-  // Top and bottom wall interactions
+  // Wall interactions to be added shortly.
   for (int x = 1; x < NUM_CELLS_WIDTH; x++)
   {
-    handleCellHorizWall(x, 1, -1.0); // bottom wall
-    handleCellHorizWall(x, NUM_CELLS_HEIGHT - 2, 1.0); // top wall
-  }
-
-  // Left and right wall interactions
-  for (int y = 1; y < NUM_CELLS_HEIGHT; y++)
-  {
-    handleCellVertiWall(1, y, -1.0); // left wall
-    // handleCellVertiWall(NUM_CELLS_WIDTH - 2, y, 1.0); // right wall
+    handleCellWall(x, 1, -1.0);
+    handleCellWall(x, NUM_CELLS_HEIGHT-2, 1.0);
   }
 
   // Growing and Mouvement
@@ -1236,6 +1109,76 @@ int initialize_cells_load(Environment &enviro, string filename, int timepoint)
   return nbr_strains;
 }
 
+int initialize_cells2(Environment &enviro, int SIM_NUM) {
+  // initialize 2 different cells from different types of cells
+  BSubt bacteria1;
+  BSubt bacteria2;
+  double length1 = bacteria1.max_length / 2.0;
+  double length2 = bacteria2.max_length / 2.0;
+  double x1, x2, y1, y2, angle1, angle2;
+  double inertia = 5.0;
+  mt19937 cell_placement(SIM_NUM);
+
+  uniform_real_distribution<double> x_dist(0 , enviro.CHANNEL_WIDTH);
+  uniform_real_distribution<double> y1_dist(length1/2.0,
+                         enviro.CHANNEL_HEIGHT - length1/2.0);
+  uniform_real_distribution<double> y2_dist(length2/2,
+                         enviro.CHANNEL_HEIGHT - length2/2);
+  uniform_real_distribution<double> init_angle(0, 2*PI);
+
+  bool intersect = true;
+  angle1 = init_angle(cell_placement);
+  angle2 = init_angle(cell_placement);
+
+  while (intersect)
+  {
+     x1 = x_dist(cell_placement);
+     x2 = x_dist(cell_placement);
+
+     y1 = y1_dist(cell_placement);
+     y2 = y2_dist(cell_placement);
+     intersect = pointsIntersect(x1 + length1 / 2 * cos(angle1),
+                                 x1 - length1 / 2 * cos(angle1),
+                                 x2 + length2 / 2 * cos(angle2),
+                                 x2 - length2 / 2 * cos(angle2),
+                                 y1 + length1 / 2 * sin(angle1),
+                                 y1 - length1 / 2 * sin(angle1),
+                                 y2 + length2 / 2 * sin(angle2),
+                                 y2 - length2 / 2 * sin(angle2)
+                               );
+  }
+
+  ABMagent* newBacteriaPntr = new ABMagent(&enviro, x1, y1,
+                    bacteria1.radius,
+                    bacteria1.max_length,
+                    bacteria1.length,
+                    bacteria1.damping,
+                    0.0, 0.0, 0.0, 0.0,
+                    angle1,
+                    bacteria1.inertia,
+                    0.0,
+                    bacteria1.growth_rate,
+                    to_string(0),
+                    0.0, 0.0, 0.0);
+  ABMagent* newBacteriaPntr2 = new ABMagent(&enviro, x2, y2,
+                    bacteria2.radius,
+                    bacteria2.max_length,
+                    bacteria2.length,
+                    bacteria2.damping,
+                    0.0, 0.0, 0.0, 0.0,
+                    angle2,
+                    bacteria2.inertia,
+                    0.0,
+                    bacteria2.growth_rate,
+                    to_string(1),
+                    0.0, 0.0, 0.0);
+  enviro.writeSimulationAgents();
+  enviro.nbr_strains = 2;
+  enviro.writeSimulationData();
+
+  return 2;
+}
+
 
 int place_cell(Environment &enviro, Bacteria &bact, int nbr_bact_strains,
                int seed, int &strain_nbr, bool *restart) {
@@ -1328,7 +1271,6 @@ int place_cell(Environment &enviro, Bacteria &bact, int nbr_bact_strains,
   return 0;
 }
 
-
 int initialize_N_strain(Environment &enviro, int SIM_NUM, int nbr_strains_GFP,
                          int nbr_strains_MCh1, int nbr_strains_MCh2,
                          int nbr_strains_A22, int nbr_strains_bsub) {
@@ -1364,12 +1306,70 @@ int initialize_N_strain(Environment &enviro, int SIM_NUM, int nbr_strains_GFP,
 }
 
 
+int initialize_1boundary(Environment &enviro, int EXP_NUM, int bndry_nbr) {
+  // EXP_NUM has to be nbr_cells + f * 10; f is the fraction cells on the left
+
+  // Initialize the cells
+  EColiGFP bacteria;
+  double length = bacteria.max_length;
+  double x, y;
+  double angle = 0.0;
+  double inertia = 5.0;
+
+  // count number
+  int nbr_cells = enviro.CHANNEL_WIDTH / length;
+  int boundary_pos = EXP_NUM - nbr_cells;
+  int cell_boundary = nbr_cells * boundary_pos / 10;
+  y = 0.55;
+
+  // add cells
+  for (int i = 1; i <=cell_boundary; i++)
+  {
+    x = length * (i - 0.5);
+    ABMagent* newBacteriaPntr = new ABMagent(&enviro, x, y,
+                      bacteria.radius,
+                      bacteria.max_length,
+                      length,
+                      bacteria.damping,
+                      0.0, 0.0, 0.0, 0.0,
+                      angle,
+                      bacteria.inertia,
+                      0.0,
+                      bacteria.growth_rate,
+                      to_string(0),
+                      0.0, 0.0, 0.0);
+  }
+
+  for (int i = cell_boundary + 1; i <=nbr_cells; i++)
+  {
+    x = length * (i - 0.5);
+    ABMagent* newBacteriaPntr = new ABMagent(&enviro, x, y,
+                      bacteria.radius,
+                      bacteria.max_length,
+                      length,
+                      bacteria.damping,
+                      0.0, 0.0, 0.0, 0.0,
+                      angle,
+                      bacteria.inertia,
+                      0.0,
+                      bacteria.growth_rate,
+                      to_string(1),
+                      0.0, 0.0, 0.0);
+  }
+  enviro.writeSimulationAgents();
+  enviro.nbr_strains = 2;
+  enviro.writeSimulationData();
+
+  return 2;
+}
+
+
 int main (int argc, char* argv[]) {
 
   // setup simulation parameters
   double dt = 0.00025;      // timestep of simualtino in minutes
   double save_time = 60.0;  // X minutes
-  int nbr_hours = 1;       // total number of hours of simulation
+  int nbr_hours = 13;       // total number of hours of simulation
 
   // metadata of simulations
 
@@ -1396,8 +1396,6 @@ int main (int argc, char* argv[]) {
   filesystem::create_directories(sim_name);
 
   // initialize environment and save parameters
-  // TODO : define the dimensions of chamber in this function too, which 
-  // TODO : involves changing the constexp variables to another type
   Environment enviro(dt, save_time, sim_param_file, sim_agent_file, sim_data_file);
   enviro.writeSimulationParameters();
 
@@ -1412,7 +1410,7 @@ int main (int argc, char* argv[]) {
   //                      number of B. Subtilus strains)
   // where the strains are defined in bacteria.hpp
   // TODO : pass number of cells defined by each strain through this function
-  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 1, 1, 0, 0, 0);
+  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 15, 0, 0, 0, 0);
 
   // timing simulation run
   auto start = high_resolution_clock::now();

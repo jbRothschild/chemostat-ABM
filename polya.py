@@ -192,7 +192,9 @@ def initial_density_plot_A(numGenerations, fixateFraction):
     #plt.text(0.4, 0.00011, 'Coexistence', color=settings.colors['coexistence'])
     #plt.text(0.025, 0.00011, 'mCherry fix.', color=settings.colors['mCherry'])
     #plt.text(0.825, 0.00011, 'eGFP fix.', color=settings.colors['eGFP'])
-    plt.legend(title='Initial density', loc=(0.01, 0.1), framealpha=0.9)
+    legend = plt.legend(title='Initial density', loc=(0.01, 0.1), framealpha=0.9)
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     # ax1.set_ylim(0.0, 1.0)
     plt.xlim(0.0, 1.0)
     
@@ -237,7 +239,9 @@ def initial_density_plot(numGenerations, fixateFraction):
     ax1.text(0.4, 0.00011, 'Coexistence', color=settings.colors['coexistence'])
     ax1.text(0.025, 0.00011, 'mCherry fix.', color=settings.colors['mCherry'])
     ax1.text(0.825, 0.00011, 'eGFP fix.', color=settings.colors['eGFP'])
-    ax1.legend(title='Initial density', loc=(0.01, 0.1), framealpha=0.9)
+    legend = ax1.legend(title='Initial density', loc=(0.01, 0.1), framealpha=0.9)
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     # ax1.set_ylim(0.0, 1.0)
     ax1.set_xlim(0.0, 1.0)
     
@@ -257,7 +261,9 @@ def initial_density_plot(numGenerations, fixateFraction):
              label=settings.labels['coexistence'])
     ax2.set_xlabel('Initial abundance of the species')
     ax2.set_ylabel('Probability')
-    ax2.legend()
+    legend = ax2.legend()
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     ax2.set_ylim(0.0, 1.0)
     ax2.set_xlim(0, 21)
     
@@ -327,48 +333,57 @@ def initial_density_growth_plot(numTrials, numGenerations, fixateFraction,
     ax1.text(0.4, 0.27, 'Coexistence', color='k')
     ax1.text(0.025, 0.27, 'mCherry', color='k')
     ax1.text(0.85, 0.27, 'eGFP', color='k')
-    ax1.legend(title='Initial density', loc=(0.03, 0.1), framealpha=0.9)
+    legend = ax1.legend(title='Initial density', loc=(0.03, 0.1), framealpha=0.9)
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     ax1.set_ylim(0.0, 0.3)
     ax1.set_xlim(0.0, 1.0)
     
-    ax2.fill_between(densityC,
+    ax2.fill_between(2 * np.array(densityC),
                      np.array(coexistFraction) - np.array(yerrCoexist),
                      np.array(coexistFraction) + np.array(yerrCoexist),
                      color=settings.colors['coexistence'],
                      alpha=0.3)
-    ax2.fill_between(densityC,
+    ax2.fill_between(2 * np.array(densityC),
                      np.array(mchFixateFraction) - np.array(yerrMch),
                      np.array(mchFixateFraction) + np.array(yerrMch),
                      color=settings.colors['mCherry'],
                      alpha=0.3)
-    ax2.fill_between(densityC,
+    ax2.fill_between(2 * np.array(densityC),
                      np.array(gfpFixateFraction) - np.array(yerrGfp),
                      np.array(gfpFixateFraction) + np.array(yerrGfp),
                      color=settings.colors['eGFP'],
                      alpha=0.3)
     
     # plot for probability of certain densities
-    ax2.plot(initDensity, probDensityLow, color=settings.colors['mCherry'],
+    ax2.plot(2 * np.array(initDensity), probDensityLow, 
+             color=settings.colors['mCherry'],
              ls=settings.linestyles['sim'],
              marker=settings.markers['mCherry'],
+             markeredgecolor='k',
              label=settings.labels['mCherry'])
-    ax2.plot(initDensity, probDensityHigh, color=settings.colors['eGFP'],
+    ax2.plot(2 * np.array(initDensity), probDensityHigh, 
+             color=settings.colors['eGFP'],
              ls=settings.linestyles['sim'],
              marker=settings.markers['eGFP'],
+             markeredgecolor='k',
              label=settings.labels['eGFP'])
-    ax2.plot(initDensity,
+    ax2.plot(2 * np.array(initDensity),
              1. - np.array(probDensityLow) - np.array(probDensityHigh),
              color=settings.colors['coexistence'],
              ls=settings.linestyles['sim'],
              marker=settings.markers['coexistence'],
+             markeredgecolor='k',
              label=settings.labels['coexistence'])
     
     # plot settings
-    ax2.set_xlabel('Initial Strain Abundance')
+    ax2.set_xlabel('Initial Total Abundance')
     ax2.set_ylabel('Probability')
-    ax2.legend()
+    legend = ax2.legend()
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     ax2.set_ylim(0.0, 1.0)
-    ax2.set_xlim(0, 21)
+    ax2.set_xlim(0, 41)
     
     filename = 'polya_density_g_5'
     plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".pdf")
@@ -468,17 +483,22 @@ def selection_advantage_plot(numTrials, numGenerations, vecStartAbundance,
     ax2.plot(advantage, probDensityLow, color=settings.colors['mCherry'],
              ls=settings.linestyles['sim'],
              marker=settings.markers['mCherry'],
+             markeredgecolor='k',
              label=settings.labels['mCherry'])
     ax2.plot(advantage, probDensityHigh, color=settings.colors['eGFP'],
              ls=settings.linestyles['sim'],
              marker=settings.markers['eGFP'],
+             markeredgecolor='k',
              label=settings.labels['eGFP'])
     ax2.plot(advantage, probDensityCoexist,
              color=settings.colors['coexistence'],
              ls=settings.linestyles['sim'],
              marker=settings.markers['coexistence'],
+             markeredgecolor='k',
              label=settings.labels['coexistence'])
-    ax2.legend()
+    legend = ax2.legend()
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     ax2.set_xlabel('Growth Rate Ratio (eGFP/mCherry)')
     ax2.set_ylabel('Probability')
     ax2.set_ylim(0.0, 1.0)
@@ -520,7 +540,9 @@ def multispecies_coexistence(nbrCellsEnd, fixateFraction):
     ax1.set_ylabel('Probability')
     ax1.axvline(x = coexistence[0], color='k', ls=':')
     ax1.text(0.375, 0.0018, 'Presence', color='k')
-    ax1.legend(title='Number of species', framealpha=0.9)
+    legend = ax1.legend(title='Number of species', framealpha=0.9)
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     ax1.set_xlim(0.0, 1.0)
     
     ax2.plot(initDensity + 1, averageRichness)
@@ -578,7 +600,9 @@ def distribution_time(vecStartAbundance, fixateFraction):
     ax1.text(0.4, 0.00011, 'Coexistence', color=settings.colors['coexistence'])
     ax1.text(0.025, 0.00011, 'mCherry fix.', color=settings.colors['mCherry'])
     ax1.text(0.825, 0.00011, 'eGFP fix.', color=settings.colors['eGFP'])
-    ax1.legend(title='Number of draws', loc=(0.01, 0.1), framealpha=0.9)
+    legend = ax1.legend(title='Number of draws', loc=(0.01, 0.1), framealpha=0.9)
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     # ax1.set_ylim(0.0, 1.0)
     ax1.set_xlim(0.0, 1.0)
     axins = ax1.inset_axes([0.6, 0.6, 0.37, 0.37])
@@ -605,7 +629,9 @@ def distribution_time(vecStartAbundance, fixateFraction):
              label=settings.labels['coexistence'])
     ax2.set_xlabel('Number of draws')
     ax2.set_ylabel('Probability')
-    ax2.legend()
+    legend = ax2.legend()
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
     ax2.set_xscale('log')
     ax2.set_ylim(0.0, 1.0)
     # ax2.set_xlim(0, 21)
