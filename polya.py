@@ -8,6 +8,7 @@ import multiprocessing
 import matplotlib
 import os
 
+from python_src import analysis
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from matplotlib.colors import Normalize #color in log the maps
 from manuscript import growthComparison, densityComparison
@@ -641,6 +642,80 @@ def distribution_time(vecStartAbundance, fixateFraction):
     plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".png")
         
     return 0
+
+
+def polya_simulation_comparison(numTrials, numGenerations, vecStartAbundance,
+                                advantages, simulations, fixateFraction):
+    
+    # binning simulations
+    nbins = 21
+    bins = np.linspace(0.0, 1.0, nbins)
+    center = (bins[:-1] + bins[1:]) / 2
+
+    filename = 'polya_ABM'
+
+    # colors
+    cmapname = 'viridis'
+    adv = []
+    cmap = matplotlib.cm.get_cmap(cmapname)
+    colors = [cmap(nbr) for nbr in np.linspace(0.0, 0.8, num=len(advantages))]
+    
+    fig, ax = plt.subplots(1)
+    for i, sim_number in enumerate(simulations):
+        data_folder = 'data' + os.sep + f'c_exp_{sim_number}'
+        nbr_simulations = 5000
+        max_time = None
+        timestep = 1. / 12.
+        data = analysis.collect_data_array(data_folder, nbr_simulations, max_time)
+
+        max_t = np.shape(data)[2] * timestep
+        t = np.arange(0., max_t, timestep)
+        
+    
+        final_fractions_eGFP = data[:, 0, -1] / ( data[:, 1, -1] + data[:, 0, -1])
+        coex_fractions_eGFP = final_fractions_eGFP[(final_fractions_eGFP != 0.0)]
+        coex_fractions_eGFP = coex_fractions_eGFP[(coex_fractions_eGFP != 1.0)]
+        weights = np.ones_like(coex_fractions_eGFP)/float(len(coex_fractions_eGFP))
+        ax.hist(coex_fractions_eGFP,
+                edgecolor='None',
+                bins=9,
+                alpha=0.3,
+                weights=weights,
+                label=f'ABM - {advantages[i]}',
+                color=colors[i])
+
+    
+    for i, adv in enumerate(advantages):
+        # settings for simualtion
+        #vecStartAbundance = np.array([5, 5])
+        initCells = np.sum(vecStartAbundance)
+        numDraws = numGenerations - initCells
+        vecAdvantage = np.array([adv, 1.0])
+        
+        # simulation
+        simula = polya_trials(numTrials, numDraws, vecStartAbundance,
+                              vecAdvantage)
+
+        # turning simulation results into a probability distribution
+        weight = np.ones_like(simula[:, 0]) / len(simula[:,0])
+        hist, _ = np.histogram(np.array(simula[:, 0]), bins, weights = weight)
+        
+        # plotting distributions for each fitness advantage
+        ax.plot(center, hist, color=colors[i], label=f'Polya - {advantages[i]}')
+        print(hist)
+    
+    ax.set_xlabel('Final Fraction eGFP')
+    ax.set_ylabel('Probability')
+    legend = ax.legend(title='Growth Rate Ratio')
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
+    ax.set_title('Coexistence Polya and ABM')
+    ax.set_ylim(0.0, 0.4)
+    ax.set_xlim(0.0, 1.0)
+    
+    plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".pdf")
+    plt.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename + ".png")
+    return 0
     
   
 if __name__ == '__main__':
@@ -655,7 +730,11 @@ if __name__ == '__main__':
     
     # density
     # initial_density_plot(numGenerations, fixateFraction)
-    
+    advantage = [1.1, 1.0]
+    simulations = [105, 5]
+    polya_simulation_comparison(20000, numGenerations, [6, 6],
+                                advantage, simulations, fixateFraction)
+    """
     # selective advantage
     initAbundance = np.array([1, 1])
     fitnessDiff = np.logspace(0.0, 0.30102999566, 11)
@@ -665,7 +744,7 @@ if __name__ == '__main__':
     
     # density plot with selection
     initial_density_growth_plot(20000, numGenerations, fixateFraction, advantage)
-    
+    """
     #distribution_time(initAbundance, fixateFraction)
     
     # multispecies_coexistence(numGenerations, fixateFraction)

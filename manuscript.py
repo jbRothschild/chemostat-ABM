@@ -653,6 +653,9 @@ def distributionInitSpecies(filename, numberTrajectories):
     frame = legend.get_frame()
     frame.set_edgecolor('black')
     
+    print(initSpecies)
+    print(meanRich)
+    print(meanRichBias)
     
     fig3.tight_layout()
     fig3.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename
@@ -660,8 +663,6 @@ def distributionInitSpecies(filename, numberTrajectories):
     fig3.savefig(os.getcwd() + os.sep + FIGDIR + os.sep + filename
                  + "_boxplot.png")
     
-    
-    # SAD?
     return 0
 
     
@@ -670,12 +671,12 @@ if __name__ == '__main__':
     if not os.path.exists(directory):
         os.makedirs(directory)
     
-    timeDistributionPlot("time_distribution", 5000)
-    growthComparison("compare_growth_rate", 5000, True)
-    geometryComparison("compare_geometry", 5000, True)
-    densityComparison("compare_density", 5000, True)
-    frictionComparison("compare_friction", 5000, True, diff=400)
-    frictionComparison("compare_friction", 5000, True, diff=900)
+    #timeDistributionPlot("time_distribution", 5000)
+    #growthComparison("compare_growth_rate", 5000, True)
+    #geometryComparison("compare_geometry", 5000, True)
+    #densityComparison("compare_density", 5000, True)
+    #frictionComparison("compare_friction", 5000, True, diff=400)
+    #frictionComparison("compare_friction", 5000, True, diff=900)
     
     distributionInitSpecies("lanes_formed", 5000)
     

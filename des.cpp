@@ -228,8 +228,8 @@ class Environment
     int nbr_strains;
     static constexpr double CELL_SIZE = 6.0;
 
-    static constexpr double CHANNEL_WIDTH = 44.0;
-    static constexpr double CHANNEL_HEIGHT = 12.0;
+    static constexpr double CHANNEL_WIDTH = 44.0;   // 44
+    static constexpr double CHANNEL_HEIGHT = 12.0;  // 12
 
     static const int NUM_CELLS_WIDTH = 2 + ceil( CHANNEL_WIDTH / CELL_SIZE);
     static const int NUM_CELLS_HEIGHT = 2 + ceil( CHANNEL_HEIGHT / CELL_SIZE);
@@ -1110,7 +1110,7 @@ void Environment::handleInteractions()
   // Left and right wall interactions
   for (int y = 1; y < NUM_CELLS_HEIGHT; y++)
   {
-    handleCellVertiWall(1, y, -1.0); // left wall
+    // handleCellVertiWall(1, y, -1.0); // left wall
     // handleCellVertiWall(NUM_CELLS_WIDTH - 2, y, 1.0); // right wall
   }
 
@@ -1369,7 +1369,7 @@ int main (int argc, char* argv[]) {
   // setup simulation parameters
   double dt = 0.00025;      // timestep of simualtino in minutes
   double save_time = 60.0;  // X minutes
-  int nbr_hours = 1;       // total number of hours of simulation
+  int nbr_hours = 4;       // total number of hours of simulation
 
   // metadata of simulations
 
@@ -1412,7 +1412,7 @@ int main (int argc, char* argv[]) {
   //                      number of B. Subtilus strains)
   // where the strains are defined in bacteria.hpp
   // TODO : pass number of cells defined by each strain through this function
-  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 1, 1, 0, 0, 0);
+  enviro.nbr_strains = initialize_N_strain(enviro, SIM_NUM, 2, 0, 0, 0, 0);
 
   // timing simulation run
   auto start = high_resolution_clock::now();

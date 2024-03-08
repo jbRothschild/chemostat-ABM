@@ -224,8 +224,10 @@ def gif_experiment(dir, modulus=1, fileExt=r'.png'):
 
 
 if __name__ == '__main__':
-    exp_nbr = 0
-    sim_nbr = 0
-    exp_dir = os.getcwd() + os.sep + 'data' + os.sep + f'exp_nbr_{exp_nbr}'
+    exp_nbr = 656
+    sim_nbr = 1
+    path = os.getcwd()
+    parent_path = os.path.abspath(os.path.join(path, os.pardir))
+    exp_dir = parent_path + os.sep + 'data' + os.sep + f'c_exp_{exp_nbr}'
     sim_dir = plot_simulation(exp_dir, sim_nbr)
     gif_experiment(sim_dir)

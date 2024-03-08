@@ -74,7 +74,8 @@ def richness_N_strains(dir_list, bacteria_type, nbr_traj):
 
 
 if __name__ == '__main__':
-    exp_nbr = 42
+
+    exp_nbr = 169
     exp_dir = os.getcwd() + os.sep + 'data' + os.sep + f'c_exp_{exp_nbr}'
     # plot_gif(exp_dir, 5)
     labels = [['E. Coli A22 strain A', 'E. Coli A22 strain B.'],
@@ -94,8 +95,7 @@ if __name__ == '__main__':
     N_strains_wt = [25]
     N_strains_vs = [82, 83, 84, 85, 86]
 
-    
-    for exp_nbr in [2]:
+    for exp_nbr in [169]:
         exp_dir = os.getcwd() + os.sep + 'data' + os.sep + f'c_exp_{exp_nbr}'
         plot_gif(exp_dir, 0)
         initialized_start(exp_dir, nbr_traj, max_time, labels=labels[2])
